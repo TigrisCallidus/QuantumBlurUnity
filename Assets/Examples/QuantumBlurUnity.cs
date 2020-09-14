@@ -25,6 +25,9 @@ public class QuantumBlurUnity : MonoBehaviour
     [Tooltip("The image used for the blur effect and the first image used for teleportation.")] 
     public Texture2D InputTexture1;
 
+    [Tooltip("The 2nd image used for teleportation.")]
+    public Texture2D InputTexture2;
+
     [Tooltip("The rotation influences how strong the blur is. Value between 0 and 1, where 0 means no blur and 1 is fully blured.")]
     public float Rotation = 0.01f;
 
@@ -32,13 +35,11 @@ public class QuantumBlurUnity : MonoBehaviour
     public bool UseLogarithmicEncoding = false;
 
     [Tooltip("With this ticked only the decoding is done using logarithmic decoding. Showing small changes more strongly.")]
-    public bool UseOnlyLogarithmicEncoding = false;
+    public bool UseOnlyLogarithmicDecoding = false;
 
     [Tooltip("Ticked if the image is colored (in contrast to greyscale).")]
     public bool ColoredImage = false;
 
-    [Tooltip("The 2nd image used for teleportation.")]
-    public Texture2D InputTexture2;
 
     [Tooltip("Value between 0 and 1. Showing how much Image Texture 1 and 2 should be mixed. 0 = Texture 1 and 1 = Texture 2")]
     public float TeleportPercentage = 0;
@@ -96,7 +97,7 @@ public class QuantumBlurUnity : MonoBehaviour
             creator = new QuantumImageCreator();
         }
 
-        bool differentDecoding = !UseLogarithmicEncoding && UseOnlyLogarithmicEncoding;
+        bool differentDecoding = !UseLogarithmicEncoding && UseOnlyLogarithmicDecoding;
 
         if (ColoredImage)
         {
@@ -272,7 +273,7 @@ public class QuantumBlurUnity : MonoBehaviour
 
     public void SetDiffferentDecodigung(bool differentDecoding)
     {
-        UseOnlyLogarithmicEncoding = differentDecoding;
+        UseOnlyLogarithmicDecoding = differentDecoding;
     }
 
     public void ColoredSet(bool colored)

@@ -24,7 +24,7 @@ public class QuantumBlurUsage : MonoBehaviour
 {
 
     public Texture2D InputTexture;
-    public Texture2D InputTexture2;
+    //public Texture2D InputTexture2;
 
     public Texture2D OutputTexture;
 
@@ -39,10 +39,16 @@ public class QuantumBlurUsage : MonoBehaviour
         //Uncoment (delete the two //) to call the functions below when play is pressed.
 
 
-        //OutputTexture = CalculateSimpleBlur(InputTexture, Rotation, LogarithmicEncoding);
+        //Examples
 
-        //CalculateSimpleHalfBlur();
-        //CalculateUnityBlur()
+        //OutputTexture = CalculateSimpleBlur(InputTexture, Rotation, LogarithmicEncoding);
+        //OutputTexture = CalculateSimpleHalfBlur(InputTexture, Rotation, LogarithmicEncoding);
+        //OutputTexture = CalculateUnityBlur(InputTexture, Rotation);
+
+        //Your own function
+
+        //OutputTexture = CalculateMyOwnEffect(InputTexture);
+
     }
 
 
@@ -132,6 +138,8 @@ public class QuantumBlurUsage : MonoBehaviour
     {
         Texture2D outputTexture;
 
+        // Since we do not need python we do not need to intialize the creator and we can use the static functions of the QuantumImageCreator
+
         //generating the quantum circuits encoding the color channels of the image
         QuantumCircuit red = QuantumImageCreator.GetCircuitDirect(inputTexture, ColorChannel.R);
         QuantumCircuit green = QuantumImageCreator.GetCircuitDirect(inputTexture, ColorChannel.G);
@@ -147,6 +155,32 @@ public class QuantumBlurUsage : MonoBehaviour
         
         return outputTexture;
     }
+
+    /// <summary>
+    /// A placeholder for creating your own image effect.
+    /// </summary>
+    /// <param name="inputTexture">The Texture of which one wants a blurred image</param>
+    /// <returns>A texture with your own image effect applied</returns>
+    public Texture2D CalculateMyOwnEffect(Texture2D inputTexture)
+    {
+        Texture2D outputTexture;
+
+        // Since we do not need python we do not need to intialize the creator and we can use the static functions of the QuantumImageCreator
+
+        //generating the quantum circuits encoding the color channels of the image
+        QuantumCircuit red = QuantumImageCreator.GetCircuitDirect(inputTexture, ColorChannel.R);
+        QuantumCircuit green = QuantumImageCreator.GetCircuitDirect(inputTexture, ColorChannel.G);
+        QuantumCircuit blue = QuantumImageCreator.GetCircuitDirect(inputTexture, ColorChannel.B);
+
+        //Add your own quantum circuit manipulation here!
+
+
+        //Generating the texture after the quantum circuits were modified.
+        outputTexture = QuantumImageCreator.GetColoreTextureDirect(red, green, blue, inputTexture.width, inputTexture.height);
+
+        return outputTexture;
+    }
+
 
     /// <summary>
     /// Applies a partial rotation (in radian) to each qubit of a quantum circuit.

@@ -453,7 +453,7 @@ GameObject:
   - component: {fileID: 144464100}
   - component: {fileID: 144464099}
   m_Layer: 0
-  m_Name: Usage
+  m_Name: Create own effects
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -472,7 +472,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InputTexture: {fileID: 0}
-  InputTexture2: {fileID: 0}
   OutputTexture: {fileID: 0}
   Rotation: 0.25
   LogarithmicEncoding: 0
@@ -888,7 +887,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Apply
+  m_Text: Apply Blur
 --- !u!222 &506307682
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1643,7 +1642,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Loading...
+  m_Text: Calculating
 --- !u!222 &794909837
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4731,14 +4730,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InputTexture1: {fileID: 0}
-  Rotation: 0
-  UseLogarithmicEncoding: 0
-  UseOnlyLogarithmicEncoding: 0
-  ColoredImage: 1
   InputTexture2: {fileID: 0}
+  Rotation: 0.1
+  UseLogarithmicEncoding: 0
+  UseOnlyLogarithmicDecoding: 0
+  ColoredImage: 1
   TeleportPercentage: 0.5
   FolderName: Visualisation
-  FileName: Test
+  FileName: Test2
   OutputTexture: {fileID: 0}
   InputImage: {fileID: 1813452155}
   InputImage2: {fileID: 1832321435}

@@ -16,14 +16,14 @@ using UnityEngine;
 using UnityEditor;
 
 
-[CustomEditor(typeof(QuantumBlurUnity))]
+[CustomEditor(typeof(QuantumBlurUsage))]
 //Custom Editor for the QuantumBlurUnity class, adding some buttons and a representation of the Maze
-public class CustomQuantumBlurInspector : Editor {
+public class QuantumBlurUsageInspector : Editor {
 
-    QuantumBlurUnity targetTest;
+    QuantumBlurUsage targetTest;
 
     void OnEnable() {
-        targetTest = target as QuantumBlurUnity;
+        targetTest = target as QuantumBlurUsage;
     }
 
     public override void OnInspectorGUI() {
@@ -34,40 +34,25 @@ public class CustomQuantumBlurInspector : Editor {
         // Spawn buttons
 
 
-        if (GUILayout.Button("Create blurred image using quantum blur"))
+        if (GUILayout.Button("Apply Simple Blur"))
         {
-            targetTest.CreateBlur();
+            targetTest.OutputTexture=targetTest.CalculateSimpleBlur(targetTest.InputTexture, targetTest.Rotation, targetTest.LogarithmicEncoding);
         }
 
-        if (GUILayout.Button("Mix the 2 images using teleportation"))
+        if (GUILayout.Button("Apply Simple Half Blur"))
         {
-            targetTest.Teleport();
+            targetTest.OutputTexture = targetTest.CalculateSimpleHalfBlur(targetTest.InputTexture, targetTest.Rotation, targetTest.LogarithmicEncoding);
         }
 
-        if (GUILayout.Button("Load File as InputTexture"))
+        if (GUILayout.Button("Apply Unity Blur"))
         {
-            targetTest.LoadPNG();
+            targetTest.OutputTexture = targetTest.CalculateUnityBlur(targetTest.InputTexture, targetTest.Rotation);
         }
 
-
-        if (GUILayout.Button("Load File as InputTexture2"))
+        if (GUILayout.Button("Apply your own image effect"))
         {
-            targetTest.LoadPNG2();
+            targetTest.OutputTexture = targetTest.CalculateMyOwnEffect(targetTest.InputTexture);
         }
-
-        if (GUILayout.Button("Save Output Texture to specific file directly"))
-        {
-            targetTest.SaveFileDirect();
-            AssetDatabase.Refresh();
-
-        }
-
-
-        if (GUILayout.Button("Save Output Texture to file using file browser"))
-        {
-            targetTest.SaveFile();
-        }
-
     }
 
 
