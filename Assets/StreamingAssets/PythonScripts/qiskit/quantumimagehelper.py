@@ -18,9 +18,6 @@ import time
 
 #Static stuff
 
-#TODO Make Line
-#TODO Make Grid
-
 def HeightMapFromHeight(height, x, y,):
     heightMap= {}
     for i in range(x):
@@ -45,12 +42,11 @@ def HeightFromProbabilities(stringList, probabilityList, length, dimension, log=
     for i in range(length):
         probabilityDict[stringList[i]]=probabilityList[i]    
     
-    #heights = probs2heightnocircuit(dimension, probabilityDict, log)
     heights = probs2height(probabilityDict, eval(dimension), log)
     return heights
 
 
-def CombinedHeightFromProbabilities(stringList, probabilityList, length, numberOfQubits, dimension, log=False):
+def CombinedHeightFromProbabilities(stringList, probabilityList, length, numberOfQubits, dimension, log=False, max_h=0):
     probabilityDict =	{
     
     }
@@ -59,10 +55,8 @@ def CombinedHeightFromProbabilities(stringList, probabilityList, length, numberO
     
     marginals = probs2marginals(numberOfQubits, probabilityDict)
     
-    #heights=probs2heightnocircuit(dimension, marginals[0],log)
-    heights = probs2height(marginals[0], eval(dimension), log)
+    heights = probs2height(marginals[0], eval(dimension), log, max_h)
     return heights
-    # return heights
 
     
 def partial_x(circuit,fraction):
@@ -94,8 +88,8 @@ class TeleportationHelper():
         self.height1= HeightMapFromHeight(height1,x,y)
         self.height2= HeightMapFromHeight(height2,x,y)
         
-    def ApplySwap(self, mixture):
-        self.qc=swap_heights2circuit(self.height1, self.height2, mixture)
+    def ApplySwap(self, mixture, useLog=False, normalizeManually=False):
+        self.qc=swap_heights2circuit(self.height1, self.height2, mixture, useLog, normalizeManually)
 
     def GetCircuit(self):
         return self.qc       

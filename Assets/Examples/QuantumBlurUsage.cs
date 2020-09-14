@@ -18,6 +18,7 @@ using UnityEngine;
 
 /// <summary>
 /// This class is meant as an example to show how one can modify quantum circuits directly in unity to get interesting effects
+/// IMPORTANT all input textures used must have "read/write" enabled in the settings.
 /// </summary>
 public class QuantumBlurUsage : MonoBehaviour
 {
@@ -29,66 +30,129 @@ public class QuantumBlurUsage : MonoBehaviour
 
     public float Rotation = 0.25f;
 
+    public bool LogarithmicEncoding = false;
 
+
+    //This function is called when play is pressed (if a game object with this script is active in the scene)
     void Start()
     {
-        //Uncoment to call the functions when play is pressed
+        //Uncoment (delete the two //) to call the functions below when play is pressed.
 
 
-        //CalculateSimpleBlur();
+        //OutputTexture = CalculateSimpleBlur(InputTexture, Rotation, LogarithmicEncoding);
+
         //CalculateSimpleHalfBlur();
+        //CalculateUnityBlur()
     }
 
-    
-    public void CalculateSimpleBlur()
+
+    /// <summary>
+    /// Produces a blured version of the input texture (using the quantum blur algorithm) doing the blur effect directly
+    /// Does support logarithmic encoding. Blur effect done by rotation of quantum state representation.
+    /// </summary>
+    /// <param name="inputTexture">The Texture of which one wants a blurred image</param>
+    /// <param name="rotation">How strong the blur effect is.</param>
+    /// <param name="logarithmicEncoding">If logarithmic encoding is used or not.</param>
+    /// <returns>A blured texture</returns>
+    public Texture2D CalculateSimpleBlur(Texture2D inputTexture, float rotation, bool logarithmicEncoding = false)
     {
+
+        Texture2D outputTexture;
+
+        // Getting the helper class to make the rotation this will setup everything needed in python
         QuantumImageCreator creator = new QuantumImageCreator();
 
-        QuantumCircuit red = creator.GetCircuit(InputTexture, false, ColorChannel.R);
-        QuantumCircuit green = creator.GetCircuit(InputTexture, false, ColorChannel.G);
-        QuantumCircuit blue = creator.GetCircuit(InputTexture, false, ColorChannel.B);
+        //Transforming the picture into quantum states
+        //Getting 1 circuit for each color channel
+        QuantumCircuit red = creator.GetCircuit(inputTexture, logarithmicEncoding, ColorChannel.R);
+        QuantumCircuit green = creator.GetCircuit(inputTexture, logarithmicEncoding, ColorChannel.G);
+        QuantumCircuit blue = creator.GetCircuit(inputTexture, logarithmicEncoding, ColorChannel.B);
 
-        ApplyPartialQ(red, Rotation);
-        ApplyPartialQ(green, Rotation);
-        ApplyPartialQ(blue, Rotation);
+        //Applying the rotation (generating the blur). This is the image effect.
+        ApplyPartialQ(red, rotation);
+        ApplyPartialQ(green, rotation);
+        ApplyPartialQ(blue, rotation);
 
-        OutputTexture = creator.GetColoreTextureFast(red, blue, green, false);
+        //Calculating the colored output texture from the quantum circuits for the 3 channels
+        outputTexture = creator.GetColoreTextureFast(red, blue, green, logarithmicEncoding);
+
+        return outputTexture;
 
     }
 
-    public void CalculateSimpleHalfBlur()
+
+
+    /// <summary>
+    /// Produces a blured version of the input texture similar to the quantum blur algorithm but only rotating half the qubits
+    /// Does support logarithmic encoding. Blur effect done by rotation of quantum state representation.
+    /// </summary>
+    /// <param name="inputTexture">The Texture of which one wants a blurred image</param>
+    /// <param name="rotation">How strong the blur effect is.</param>
+    /// <param name="logarithmicEncoding">If logarithmic encoding is used or not.</param>
+    /// <returns>A blured texture</returns>
+    public Texture2D CalculateSimpleHalfBlur(Texture2D inputTexture, float rotation, bool logarithmicEncoding = false)
     {
+
+        Texture2D outputTexture;
+
+        // Getting the helper class to make the rotation this will setup everything needed in python
         QuantumImageCreator creator = new QuantumImageCreator();
 
-        QuantumCircuit red = creator.GetCircuit(InputTexture, false, ColorChannel.R);
-        QuantumCircuit green = creator.GetCircuit(InputTexture, false, ColorChannel.G);
-        QuantumCircuit blue = creator.GetCircuit(InputTexture, false, ColorChannel.B);
+        //Transforming the picture into quantum states
+        //Getting 1 circuit for each color channel
+        QuantumCircuit red = creator.GetCircuit(inputTexture, logarithmicEncoding, ColorChannel.R);
+        QuantumCircuit green = creator.GetCircuit(inputTexture, logarithmicEncoding, ColorChannel.G);
+        QuantumCircuit blue = creator.GetCircuit(inputTexture, logarithmicEncoding, ColorChannel.B);
 
-        ApplyHalfPartialQ(red, Rotation);
-        ApplyHalfPartialQ(green, Rotation);
-        ApplyHalfPartialQ(blue, Rotation);
+        //Applying the rotation (generating the blur). This is the image effect.
+        //Similar as ApplyPartialQ but only applies it to half the qubits
+        ApplyHalfPartialQ(red, rotation);
+        ApplyHalfPartialQ(green, rotation);
+        ApplyHalfPartialQ(blue, rotation);
 
-        OutputTexture = creator.GetColoreTextureFast(red, blue, green, false);
+        //Calculating the colored output texture from the quantum circuits for the 3 channels
+        outputTexture = creator.GetColoreTextureFast(red, blue, green, logarithmicEncoding);
+
+        return outputTexture;
 
     }
 
-    //Applying quantumblur effect in unity without the python code
-    public void CalculateUnityBlur()
+
+    //TODO Fix output errors
+
+    /// <summary>
+    /// Produces a blured version of the input texture (using the quantum blur algorithm) directly in unity without the use of python.
+    /// Does NOT support logarithmic encoding. Blur effect done by rotation of quantum state representation.
+    /// IS A LOT faster than python version, however, the result still has some errors.
+    /// </summary>
+    /// <param name="inputTexture">The Texture of which one wants a blurred image</param>
+    /// <param name="rotation">How strong the blur effect is.</param>
+    /// <returns>A blured texture</returns>
+    public Texture2D CalculateUnityBlur(Texture2D inputTexture, float rotation)
     {
-        QuantumCircuit red = QuantumImageCreator.GetCircuitDirect(InputTexture, false, ColorChannel.R);
-        ApplyPartialQ(red, Rotation);
+        Texture2D outputTexture;
 
-        QuantumCircuit green = QuantumImageCreator.GetCircuitDirect(InputTexture, false, ColorChannel.G);
-        ApplyPartialQ(green, Rotation);
+        //generating the quantum circuits encoding the color channels of the image
+        QuantumCircuit red = QuantumImageCreator.GetCircuitDirect(inputTexture, ColorChannel.R);
+        QuantumCircuit green = QuantumImageCreator.GetCircuitDirect(inputTexture, ColorChannel.G);
+        QuantumCircuit blue = QuantumImageCreator.GetCircuitDirect(inputTexture, ColorChannel.B);
 
+        //applying the rotation generating the blur effect
+        ApplyPartialQ(red, rotation);
+        ApplyPartialQ(green, rotation);
+        ApplyPartialQ(blue, rotation);
 
-        QuantumCircuit blue = QuantumImageCreator.GetCircuitDirect(InputTexture, false, ColorChannel.B);
-        ApplyPartialQ(blue, Rotation);
-
-        OutputTexture = QuantumImageCreator.GetColoreTextureDirect(red, green, blue, InputTexture.width, InputTexture.height);
-        OutputTexture.filterMode = FilterMode.Bilinear;
+        //Generating the texture after the quantum circuits were modified.
+        outputTexture = QuantumImageCreator.GetColoreTextureDirect(red, green, blue, inputTexture.width, inputTexture.height);
+        
+        return outputTexture;
     }
 
+    /// <summary>
+    /// Applies a partial rotation (in radian) to each qubit of a quantum circuit.
+    /// </summary>
+    /// <param name="circuit">The quantum circuit to which the rotation is applied</param>
+    /// <param name="rotation">The applied rotation. Rotation is in radian (so 2PI is a full rotation)</param>
     public void ApplyPartialQ(QuantumCircuit circuit, float rotation)
     {
         for (int i = 0; i < circuit.NumberOfQubits; i++)
@@ -97,12 +161,16 @@ public class QuantumBlurUsage : MonoBehaviour
         }
     }
 
-
+    /// <summary>
+    /// Applies a partial rotation (in radian) to half ot the qubits of a quantum circuit.
+    /// </summary>
+    /// <param name="circuit">The quantum circuit to which the rotation is applied</param>
+    /// <param name="rotation">The applied rotation. Rotation is in radian (so 2PI is a full rotation)</param>
     public void ApplyHalfPartialQ(QuantumCircuit circuit, float rotation)
     {
         for (int i = 0; i < circuit.NumberOfQubits; i++)
         {
-            if (i % 2 ==0)
+            if (i % 2 == 0)
             {
                 circuit.RX(i, rotation);
             }
@@ -110,8 +178,6 @@ public class QuantumBlurUsage : MonoBehaviour
     }
 
 
-
-    //TODO Use lines / other example not using image
 
 
 }

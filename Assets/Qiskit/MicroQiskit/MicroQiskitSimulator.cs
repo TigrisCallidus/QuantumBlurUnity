@@ -112,6 +112,8 @@ namespace Qiskit
         /// <returns></returns>
         public override double[] GetProbabilities(QuantumCircuit circuit)
         {
+            //TODO Optimization re/abuse amplitude for probabilities?
+
             ComplexNumber[] amplitudes = Simulate(circuit);
             return base.GetProbabilities(amplitudes);
         }

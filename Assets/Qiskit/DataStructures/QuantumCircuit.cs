@@ -257,10 +257,10 @@ namespace Qiskit
                 return;
             }
 
-
             if (sum < 1 - MathHelper.Eps || sum > 1 + MathHelper.Eps)
             {
                 OriginalSum = sum;
+                
                 sum = Math.Sqrt(sum);
 
                 for (int i = 0; i < Amplitudes.Length; i++)

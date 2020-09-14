@@ -302,7 +302,7 @@ def make_grid(Lx,Ly=None):
     return grid, n
 
 
-def height2circuit(height, log=False, eps=1e-4):
+def height2circuit(height, log=False,  normalizeManually=False, eps=1e-4):
     """
     Converts a dictionary of heights (or brightnesses) on a grid into
     a quantum circuit.
@@ -339,7 +339,9 @@ def height2circuit(height, log=False, eps=1e-4):
                 state[ int(bitstring,2) ] = math.sqrt(base**(float(h)/min_h))
             else:
                 state[ int(bitstring,2) ] = math.sqrt( h )
-    state = normalize(state)
+    
+    if not normalizeManually:
+        state = normalize(state)
         
     # define and initialize quantum circuit            
     qc = QuantumCircuit(n)
@@ -353,7 +355,7 @@ def height2circuit(height, log=False, eps=1e-4):
     return qc
 
 
-def probs2height(probs, size=None, log=False):
+def probs2height(probs, size=None, log=False, max_h=0):
     """
     Extracts a dictionary of heights (or brightnesses) on a grid from
     a set of probabilities for the output of a quantum circuit into
@@ -383,7 +385,8 @@ def probs2height(probs, size=None, log=False):
     grid,_ = make_grid(Lx,Ly)
     
     # set height to probs value, rescaled such that the maximum is 1
-    max_h = max( probs.values() )   
+    if max_h==0:
+        max_h = max( probs.values() )   
     height = {(x,y):0.0 for x in range(Lx) for y in range(Ly)}
     for bitstring in probs:
         if bitstring in grid:
@@ -619,7 +622,7 @@ def swap_heights(height0, height1, fraction, log=False, ):
     return new_heights[0], new_heights[1]
 
 
-def swap_heights2circuit(height0, height1, fraction, log=False, ):
+def swap_heights2circuit(height0, height1, fraction, log=False, normalizeManually=False):
     """
     Given a pair of height maps for the same sized grid, a set of partial
     swaps is applied between corresponding qubits in each circuit.
@@ -640,12 +643,15 @@ def swap_heights2circuit(height0, height1, fraction, log=False, ):
     "Objects to be swapped are not the same size"   
     
     # set up the circuit to be run
-    circuits = [height2circuit(height) for height in [height0,height1]]
-    combined_qc = combine_circuits(circuits[0], circuits[1])
+    #circuits = [height2circuit(height, False, normalizeManually) for height in [height0,height1]]
     
+    circuit0=height2circuit(height0, False, normalizeManually)
+    circuit1=height2circuit(height1, False, normalizeManually)
+    
+    combined_qc = combine_circuits(circuit0, circuit1)    
     
     partialswap(combined_qc, fraction)
-    combined_qc.name=circuits[0].name
+    combined_qc.name=circuit0.name
     
     return combined_qc
     

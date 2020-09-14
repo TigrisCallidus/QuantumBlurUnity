@@ -21,6 +21,9 @@ using Microsoft.Scripting.Hosting;
 
 namespace QuantumImage
 {
+ /// <summary>
+ /// Enum used to pick channels in some functions.
+ /// </summary>
     public enum ColorChannel
     {
         R,
@@ -29,24 +32,30 @@ namespace QuantumImage
         A
     }
 
+    /// <summary>
+    /// Class for creating quantum image effects.Contains transformations (image to circuit, and vice versa) 
+    /// as well as the fully ready effects QuantumBlur (which uses rotation on the qubits to Blur the image)
+    /// and Teleportation which kinda mixes two different images. Most things are provided for grey and colored seperately.
+    /// </summary>
     public class QuantumImageCreator
     {
 
+        //This class uses IronPython for some of it functions this are for the pathfs to find the files.
         const string libPath = @"/StreamingAssets/Lib/";
         const string pythonScriptsPath = @"/StreamingAssets/PythonScripts/";
         const string imageHelperName = @"quantumimagehelper.py";
-        //const string advancedQiskitTest = @"microqisktiTestAdvanced/";
         const string qiskitFolder = @"qiskit/";
 
+        //internal values for the python in order to only have to do this initialization once, since it is quite slow.
         ScriptEngine engine;
-        dynamic PythonFile;
-        dynamic BlurHelper;
+        dynamic pythonFile;
+        dynamic blurHelper;
 
 
-
-
-
-
+        /// <summary>
+        /// Initialisation only needed for effects, which use the python files.
+        /// Is relatively slow, so should be only called once.
+        /// </summary>
         public QuantumImageCreator()
         {
             //Init python
@@ -58,66 +67,29 @@ namespace QuantumImage
             //Path to the Python standard library
             searchPaths.Add(Application.dataPath + libPath);
             engine.SetSearchPaths(searchPaths);
+            
+            //loading the python file (with all its functionality (functions from it can be called)
+            pythonFile = engine.ExecuteFile(Application.dataPath + pythonScriptsPath + qiskitFolder + imageHelperName);
 
-            PythonFile = engine.ExecuteFile(Application.dataPath + pythonScriptsPath + qiskitFolder + imageHelperName);
-
-            BlurHelper = PythonFile.QuantumBlurHelper("BlurHelper");
-        }
-
-
-        public static QuantumCircuit GetCircuitDirect(double[,] imageData, bool useLog = false)
-        {
-            return QuantumImageHelper.HeightToCircuit(imageData);
-        }
-
-        public static QuantumCircuit GetCircuitDirect(float[,] imageData, bool useLog = false)
-        {
-            return QuantumImageHelper.HeightToCircuit(imageData);
-        }
-
-        public static QuantumCircuit GetCircuitDirect(Texture2D inputTexture, bool useLog = false, ColorChannel colorChannel = ColorChannel.R)
-        {
-            double[,] imageData = QuantumImageHelper.GetHeightArrayDouble(inputTexture, colorChannel);
-
-            return GetCircuitDirect(imageData, useLog);
-        }
-
-        //TODO Make version with only floats
-        public static Texture2D GetGreyTextureDirect(QuantumCircuit quantumCircuit, int width, int height, bool undoNormalization = false, bool useLog = false)
-        {
-            double[,] imageData = QuantumImageHelper.CircuitToHeight2D(quantumCircuit, width, height, undoNormalization);
-
-            return QuantumImageHelper.CalculateGreyTexture(imageData);
-        }
-
-
-        public static Texture2D GetColoreTextureDirect(QuantumCircuit redCircuit, QuantumCircuit greenCircuit, QuantumCircuit blueCircuit, int width, int height, bool undoNormalization=false, bool useLog = false)
-        {
-
-
-            double[,] redData = QuantumImageHelper.CircuitToHeight2D(redCircuit, width, height, undoNormalization);
-            double[,] greenData = QuantumImageHelper.CircuitToHeight2D(greenCircuit, width, height, undoNormalization);
-            double[,] blueData = QuantumImageHelper.CircuitToHeight2D(blueCircuit, width, height, undoNormalization);
-
-            return QuantumImageHelper.CalculateColorTexture(redData, greenData, blueData);
-
+            //Creating a QuantumBlurHelper class used for the QuantumBlur
+            blurHelper = pythonFile.QuantumBlurHelper("BlurHelper");
         }
 
 
 
-        public QuantumCircuit GetCircuit(double[,] imageData, bool useLog = false)
-        {
-            //dynamic pythonHelper = PythonFile.QuantumBlurHelper("Helper");
-            BlurHelper.SetHeights(imageData, imageData.GetLength(0), imageData.GetLength(1), useLog);
 
-            dynamic circuit = BlurHelper.GetCircuit();
-            int numberofQubits = circuit.num_qubits;
 
-            return QuantumImageHelper.ParseCircuit(circuit.data, numberofQubits, circuit.name);
-        }
 
+        /// <summary>
+        /// Constructs a quantum circuit representing an image for a specific color channel.
+        /// </summary>
+        /// <param name="inputTexture">The texture from which a circuit is constructed</param>
+        /// <param name="useLog">If logarithmic encoding should be used for the picture</param>
+        /// <param name="colorChannel">The color channel (of the texture) which will be used to generate the image</param>
+        /// <returns></returns>
         public QuantumCircuit GetCircuit(Texture2D inputTexture, bool useLog = false, ColorChannel colorChannel = ColorChannel.R)
         {
+            //TODO optimize to get 3 channels directly
             double[,] imageData;
 
             switch (colorChannel)
@@ -142,25 +114,54 @@ namespace QuantumImage
             return GetCircuit(imageData, useLog);
         }
 
+        /// <summary>
+        /// Constructs a quantum circuit from a double array (most likely representing (a colorchannel of) an image).
+        /// </summary>
+        /// <param name="imageData">The data which should be represented as a quantum circuit</param>
+        /// <param name="useLog">If logarithmic encoding should be used for the data</param>
+        /// <returns></returns>
+        public QuantumCircuit GetCircuit(double[,] imageData, bool useLog = false)
+        {
+            //dynamic pythonHelper = PythonFile.QuantumBlurHelper("Helper");
+            blurHelper.SetHeights(imageData, imageData.GetLength(0), imageData.GetLength(1), useLog);
 
+            dynamic circuit = blurHelper.GetCircuit();
+            int numberofQubits = circuit.num_qubits;
 
+            return QuantumImageHelper.ParseCircuit(circuit.data, numberofQubits, circuit.name);
+        }
 
+        /// <summary>
+        /// Constructing a greyscale image from a single quantumCircuit (which should represent a greyscale image).
+        /// Used after image effect are applied to the image (the circuit) to get the modified picture.
+        /// </summary>
+        /// <param name="quantumCircuit">The circuit representing the (modified) image.</param>
+        /// <param name="useLog">If logarithmic decoding should be used to decode the image.</param>
+        /// <returns></returns>
         public Texture2D GetGreyTexture(QuantumCircuit quantumCircuit, bool useLog = false)
         {
+            
             MicroQiskitSimulator simulator = new MicroQiskitSimulator();
 
             double[] doubleArray = new double[0];
             string[] stringArray = new string[0];
 
             QuantumImageHelper.GetProbabilityArrays(simulator.GetProbabilities(quantumCircuit), quantumCircuit.NumberOfQubits, ref doubleArray, ref stringArray);
-            IronPython.Runtime.PythonDictionary dictionary = PythonFile.HeightFromProbabilities(stringArray, doubleArray, doubleArray.Length, quantumCircuit.DimensionString, useLog);
+            IronPython.Runtime.PythonDictionary dictionary = pythonFile.HeightFromProbabilities(stringArray, doubleArray, doubleArray.Length, quantumCircuit.DimensionString, useLog);
 
             return QuantumImageHelper.CalculateGreyTexture(dictionary, quantumCircuit.DimensionString);
         }
 
 
-
-
+        /// <summary>
+        /// Constructing a colored image from 3 quantumCircuits, 1 per channel, (which should represent a colored image).
+        /// Used after image effect are applied to the image (the circuit) to get the modified picture
+        /// </summary>
+        /// <param name="redCircuit">The circuit representing the red color channel of the (modified) image.</param>
+        /// <param name="greenCircuit">The circuit representing the green color channel of the (modified) image</param>
+        /// <param name="blueCircuit">The circuit representing the blue color channel of the (modified) image</param>
+        /// <param name="useLog">If logarithmic decoding should be used to decode the image.</param>
+        /// <returns></returns>
         public Texture2D GetColoreTexture(QuantumCircuit redCircuit, QuantumCircuit greenCircuit, QuantumCircuit blueCircuit, bool useLog = false)
         {
             MicroQiskitSimulator simulator = new MicroQiskitSimulator();
@@ -170,17 +171,27 @@ namespace QuantumImage
             string[] stringArray = new string[0];
 
             QuantumImageHelper.GetProbabilityArrays(simulator.GetProbabilities(redCircuit), redCircuit.NumberOfQubits, ref doubleArray, ref stringArray);
-            IronPython.Runtime.PythonDictionary redDictionary = PythonFile.HeightFromProbabilities(stringArray, doubleArray, doubleArray.Length, redCircuit.DimensionString, useLog);
+            IronPython.Runtime.PythonDictionary redDictionary = pythonFile.HeightFromProbabilities(stringArray, doubleArray, doubleArray.Length, redCircuit.DimensionString, useLog);
 
             QuantumImageHelper.GetProbabilityArrays(simulator.GetProbabilities(greenCircuit), greenCircuit.NumberOfQubits, ref doubleArray, ref stringArray);
-            IronPython.Runtime.PythonDictionary greenDictionary = PythonFile.HeightFromProbabilities(stringArray, doubleArray, doubleArray.Length, greenCircuit.DimensionString, useLog);
+            IronPython.Runtime.PythonDictionary greenDictionary = pythonFile.HeightFromProbabilities(stringArray, doubleArray, doubleArray.Length, greenCircuit.DimensionString, useLog);
 
             QuantumImageHelper.GetProbabilityArrays(simulator.GetProbabilities(blueCircuit), blueCircuit.NumberOfQubits, ref doubleArray, ref stringArray);
-            IronPython.Runtime.PythonDictionary blueDictionary = PythonFile.HeightFromProbabilities(stringArray, doubleArray, doubleArray.Length, blueCircuit.DimensionString, useLog);
+            IronPython.Runtime.PythonDictionary blueDictionary = pythonFile.HeightFromProbabilities(stringArray, doubleArray, doubleArray.Length, blueCircuit.DimensionString, useLog);
 
             return QuantumImageHelper.CalculateColorTexture(redDictionary, greenDictionary, blueDictionary, redCircuit.DimensionString);
         }
 
+        /// <summary>
+        /// A slightly faster version to construct a colored image from 3 quantumCircuits, 1 per channel, (which should represent a colored image).
+        /// Used after image effect are applied to the image (the circuit) to get the modified picture
+        /// This version should produce less garbage, however, it only makes a small difference, since the python part is the same (and the slow part)
+        /// </summary>
+        /// <param name="redCircuit">The circuit representing the red color channel of the (modified) image.</param>
+        /// <param name="greenCircuit">The circuit representing the green color channel of the (modified) image</param>
+        /// <param name="blueCircuit">The circuit representing the blue color channel of the (modified) image</param>
+        /// <param name="useLog">If logarithmic decoding should be used to decode the image.</param>
+        /// <returns></returns>
         public Texture2D GetColoreTextureFast(QuantumCircuit redCircuit, QuantumCircuit greenCircuit, QuantumCircuit blueCircuit, bool useLog = false)
         {
             MicroQiskitSimulator simulator = new MicroQiskitSimulator();
@@ -190,35 +201,37 @@ namespace QuantumImage
             double[] probabilities = new double[MathHelper.IntegerPower(2, redCircuit.NumberOfQubits)];
             ComplexNumber[] amplitudes = null;
 
-
-            //Debug.Log(redCircuit.NumberOfQubits + " is the number of qubits");
-
             string[] stringArray = QuantumImageHelper.CalculateNameStrings(probabilities.Length, redCircuit.NumberOfQubits);
 
             simulator.CalculateProbabilities(redCircuit, ref probabilities, ref amplitudes);
 
-            IronPython.Runtime.PythonDictionary redDictionary = PythonFile.HeightFromProbabilities(stringArray, probabilities, probabilities.Length, redCircuit.DimensionString, useLog);
+            IronPython.Runtime.PythonDictionary redDictionary = pythonFile.HeightFromProbabilities(stringArray, probabilities, probabilities.Length, redCircuit.DimensionString, useLog);
 
             simulator.CalculateProbabilities(greenCircuit, ref probabilities, ref amplitudes);
-            IronPython.Runtime.PythonDictionary greenDictionary = PythonFile.HeightFromProbabilities(stringArray, probabilities, probabilities.Length, greenCircuit.DimensionString, useLog);
+            IronPython.Runtime.PythonDictionary greenDictionary = pythonFile.HeightFromProbabilities(stringArray, probabilities, probabilities.Length, greenCircuit.DimensionString, useLog);
 
             simulator.CalculateProbabilities(blueCircuit, ref probabilities, ref amplitudes);
-            IronPython.Runtime.PythonDictionary blueDictionary = PythonFile.HeightFromProbabilities(stringArray, probabilities, probabilities.Length, blueCircuit.DimensionString, useLog);
+            IronPython.Runtime.PythonDictionary blueDictionary = pythonFile.HeightFromProbabilities(stringArray, probabilities, probabilities.Length, blueCircuit.DimensionString, useLog);
 
             return QuantumImageHelper.CalculateColorTexture(redDictionary, greenDictionary, blueDictionary, redCircuit.DimensionString);
         }
 
 
+        /// <summary>
+        /// Directly creates a blured image out of the greyscale input texture using the quantum blur algorithm.
+        /// The blur is done via rotating qubits (in radian). Supports logarithmic encoding.
+        /// </summary>
+        /// <param name="inputTexture">The image on which the blur should be applied.</param>
+        /// <param name="rotation">The rotation which should be applied in radian.</param>
+        /// <param name="useLog">If logarithmic encoding (and decoding) should be used</param>
+        /// <param name="useDifferentDecoding">If the decoding used should be not the same as the encoding (for example if you only want to sue logarithmic decoding)</param>
+        /// <returns></returns>
         public Texture2D CreateBlurTextureGrey(Texture2D inputTexture, float rotation, bool useLog = false, bool useDifferentDecoding = false)
         {
             Texture2D OutputTexture;
 
             double[,] imageData = QuantumImageHelper.GetGreyHeighArray(inputTexture);
             QuantumCircuit quantumCircuit = getBlurCircuitFromData(imageData, rotation, useLog);
-
-            //string heightDimensions;
-            //IronPython.Runtime.PythonDictionary dictionary = getBlurDictionaryFromData(out heightDimensions, imageData, rotation, useLog);
-            //OutputTexture = QuantumImageHelper.CalculateGreyTexture(dictionary, heightDimensions);
 
             if (useDifferentDecoding)
             {
@@ -230,31 +243,34 @@ namespace QuantumImage
         }
 
 
+
+        /// <summary>
+        /// Directly creates a blured image out of the greyscale input texture using the quantum blur algorithm.
+        /// The blur is done via rotating qubits (in radian). Supports logarithmic encoding.
+        /// </summary>
+        /// <param name="inputTexture">The image on which the blur should be applied.</param>
+        /// <param name="rotation">The rotation which should be applied in radian.</param>
+        /// <param name="useLog">If logarithmic encoding (and decoding) should be used</param>
+        /// <param name="useDifferentDecoding">If the decoding used should be not the same as the encoding (for example if you only want to sue logarithmic decoding)</param>
+        /// <param name="doFast">If the (most of the time) faster creation of color image should be used.</param>
+        /// <returns></returns>
         public Texture2D CreateBlurTextureColor(Texture2D inputTexture, float rotation, bool useLog = false, bool useDifferentDecoding = false, bool doFast = false)
         {
             Texture2D OutputTexture;
-            //string heightDimensions;
 
             double[,] imageData = QuantumImageHelper.GetRedHeightArray(inputTexture);
             QuantumCircuit redCircuit = getBlurCircuitFromData(imageData, rotation, useLog);
 
-            //IronPython.Runtime.PythonDictionary redDictionary = getBlurDictionaryFromData(out heightDimensions, imageData, rotation, useLog);
-
             QuantumImageHelper.FillGreenHeighArray(inputTexture, imageData);
             QuantumCircuit greenCircuit = getBlurCircuitFromData(imageData, rotation, useLog);
-            //IronPython.Runtime.PythonDictionary greenDictionary = getBlurDictionaryFromData(out heightDimensions, imageData, rotation, useLog);
 
             QuantumImageHelper.FillBlueHeighArray(inputTexture, imageData);
             QuantumCircuit blueCircuit = getBlurCircuitFromData(imageData, rotation, useLog);
-            //IronPython.Runtime.PythonDictionary blueDictionary = getBlurDictionaryFromData(out heightDimensions, imageData, rotation, useLog);
-
-            //OutputTexture = QuantumImageHelper.CalculateColorTexture(redDictionary, greenDictionary, blueDictionary, heightDimensions);
 
             if (useDifferentDecoding)
             {
                 useLog = !useLog;
             }
-
 
             if (doFast)
             {
@@ -265,18 +281,261 @@ namespace QuantumImage
                 OutputTexture = GetColoreTexture(redCircuit, greenCircuit, blueCircuit, useLog);
             }
 
+            return OutputTexture;
+        }
+
+        /// <summary>
+        /// Using the quantum teleportation algorithm to mix 2 images. 
+        /// Kind of using teleportation to swap placed between the 2 images.
+        /// Teleportation progress of 0 means no teleportation, Teleportation progress of 1 means the teleportation finished.
+        /// And Teleportation progress of 0.5 means it is right in the middle.
+        /// </summary>
+        /// <param name="inputTexture">The first image which should be mixed.</param>
+        /// <param name="inputTexture2">The second image which should be mixed.</param>
+        /// <param name="teleportationProgress">How far the teleportation has progressed. 0 Not at all, 0.5 in the middle, 1 finished. Can take on any value between 0 and 1</param>
+        /// <returns></returns>
+        public Texture2D TeleportTexturesGrey(Texture2D inputTexture, Texture2D inputTexture2, double teleportationProgress)
+        {
+            string heightDimensions;
+
+            Texture2D OutputTexture = new Texture2D(2, 2);
+
+            double[,] imageData = QuantumImageHelper.GetGreyHeighArray(inputTexture);
+            double[,] imageData2 = QuantumImageHelper.GetGreyHeighArray(inputTexture2);
+
+            IronPython.Runtime.PythonDictionary greyDictionary = getTeleportDictionaryFromData(out heightDimensions, imageData, imageData2, teleportationProgress);
+            OutputTexture = QuantumImageHelper.CalculateGreyTexture(greyDictionary, heightDimensions);
 
             return OutputTexture;
         }
 
 
+        /// <summary>
+        /// Using the quantum teleportation algorithm to mix 2 images. This is A LOT FASTER than the other Teleport method.
+        /// It splits the image into smaller images, which can be progressed way faster and then puts them back together.
+        /// Can sometimes have some slight errors  in images with big blocks of black pixels.
+        /// Else it uses the same method of using teleportation to swap placed between the 2 images.
+        /// Teleportation progress of 0 means no teleportation, Teleportation progress of 1 means the teleportation finished.
+        /// And Teleportation progress of 0.5 means it is right in the middle.
+        /// </summary>
+        /// <param name="inputTexture">The first image which should be mixed.</param>
+        /// <param name="inputTexture2">The second image which should be mixed.</param>
+        /// <param name="teleportationProgress">How far the teleportation has progressed. 0 Not at all, 0.5 in the middle, 1 finished. Can take on any value between 0 and 1</param>
+        /// <returns></returns>
+        public Texture2D TeleportTexturesGreyPartByPart(Texture2D inputTexture, Texture2D inputTexture2, double mixture)
+        {
+            int dimX = 8;
+            int dimY = 8;
+
+            int width = inputTexture.width;
+            int height = inputTexture.height;
+
+            if (inputTexture2.width < inputTexture.width || inputTexture2.height < inputTexture.height)
+            {
+                if (inputTexture2.width > inputTexture.width || inputTexture2.height > inputTexture.height)
+                {
+                    Debug.LogError("Can't find matching dimension.");
+                    return new Texture2D(width, height);
+                }
+                else
+                {
+                    Debug.LogWarning("Inputtexture 1 is too big only part of it will be used");
+                    width = inputTexture2.width;
+                    height = inputTexture2.height;
+                }
+
+            }
+            else if (inputTexture2.width > inputTexture.width || inputTexture2.height > inputTexture.height)
+            {
+                Debug.LogWarning("Inputtexture 2 is too big only part of it will be used");
+
+            }
+
+            if (width%8 !=0)
+            {
+                Debug.LogWarning("Width not divisble by 8 sleighly cutting width (by " + width % 8 + ").");
+                width = width - (width % 8);
+            }
+
+            if (height % 8 != 0)
+            {
+                Debug.LogWarning("Height not divisble by 8 sleighly cutting width (by " + height % 8 + ").");
+                height = height - (height % 8);
+            }
+
+            int totalX = width / dimX;
+            int totalY = height / dimY;
+
+
+            int startX = 0;
+            int startY = 0;
+
+            double[,] imageData = new double[dimX, dimY];
+            double[,] imageData2 = new double[dimX, dimY];
+            Texture2D OutputTexture = new Texture2D(width, height);
+
+            string heightDimensions;
+
+            IronPython.Runtime.PythonDictionary greyDictionary;
+
+            for (int i = 0; i < totalX; i++)
+            {
+                for (int j = 0; j < totalY; j++)
+                {
+                    QuantumImageHelper.FillPartialHeightArray(inputTexture, imageData, ColorChannel.R, startX, startY, dimX, dimY);
+                    QuantumImageHelper.FillPartialHeightArray(inputTexture2, imageData2, ColorChannel.R, startX, startY, dimX, dimY);
+
+                    greyDictionary = getTeleportDictionaryFromData(out heightDimensions, imageData, imageData2, mixture, true);
+
+                    QuantumImageHelper.FillTextureGrey(greyDictionary, OutputTexture, startX, startY);
+
+                    startY += dimY;
+                    startY = startY % width;
+                }
+                startX += dimX;
+            }
+
+            OutputTexture.Apply();
+
+            return OutputTexture;
+        }
+
+
+
+        //This region contains effecs, which do not need python, so no initialization needed and just static functions.
+        #region Direct Effects (without Python)
+
+
+        /// <summary>
+        /// Getting a quantum circuit representation of a color channel directly without using python.
+        /// Is faster than python versions but does not support logarithmic encoding yet and may still contain some errors.
+        /// </summary>
+        /// <param name="inputTexture">The image which should be converted to a circuit</param>
+        /// <param name="colorChannel">Which color channel is converted</param>
+        /// <param name="useLog">If logarithmic encoding is chosen DOES NOTHING (at the moment)</param>
+        /// <returns></returns>
+        public static QuantumCircuit GetCircuitDirect(Texture2D inputTexture, ColorChannel colorChannel = ColorChannel.R, bool useLog = false)
+        {
+            //TODO logarithmic encoding
+            //TODO no need to go over double array unneeded copying
+            double[,] imageData = QuantumImageHelper.GetHeightArrayDouble(inputTexture, colorChannel);
+
+            return GetCircuitDirect(imageData, useLog);
+        }
+
+        /// <summary>
+        /// Getting a quantum circuit representation of a 2d array of data. (Most likely an image but can be other things). Not using python
+        /// Is faster than python versions but does not support logarithmic encoding yet and may still contain some errors.
+        /// </summary>
+        /// <param name="imageData">The data (of the image) as a 2d double array. For image data floats would be more than sufficient!</param>
+        /// <param name="useLog">If logarithmic encoding is chosen DOES NOTHING (at the moment)</param>
+        /// <returns></returns>
+        public static QuantumCircuit GetCircuitDirect(double[,] imageData, bool useLog = false)
+        {
+            return QuantumImageHelper.HeightToCircuit(imageData);
+        }
+
+        /// <summary>
+        /// Getting a quantum circuit representation of a 2d array of data. (Most likely an image but can be other things). Not using python
+        /// Is faster than python versions but does not support logarithmic encoding yet and may still contain some errors.
+        /// </summary>
+        /// <param name="imageData">The data (of the image) as a 2d double array. For image data floats is more than sufficient!</param>
+        /// <param name="useLog">If logarithmic encoding is chosen DOES NOTHING (at the moment)</param>
+        /// <returns></returns>
+        public static QuantumCircuit GetCircuitDirect(float[,] imageData, bool useLog = false)
+        {
+            return QuantumImageHelper.HeightToCircuit(imageData);
+        }
+
+
+        /// <summary>
+        /// Getting a quantum circuit representation of each color channel of an image directly without using python.
+        /// Is faster than python versions but does not support logarithmic encoding yet and may still contain some errors.
+        /// </summary>
+        /// <param name="inputTexture">The image which should be converted into quantum circuits representing the channels</param>
+        /// <param name="redChannel">Returns the quantum circuit for the red channel of the image.</param>
+        /// <param name="greenChannel">Returns the quantum circuit for the green channel of the image.</param>
+        /// <param name="blueChannel">Returns the quantum circuit for the blue channel of the image.</param>
+        /// <param name="useLog">If logarithmic encoding is chosen DOES NOTHING (at the moment)</param>
+        public static void GetCircuitDirectPerChannel(Texture2D inputTexture, out QuantumCircuit redChannel, out QuantumCircuit greenChannel, out QuantumCircuit blueChannel, bool useLog = false)
+        {
+            QuantumImageHelper.TextureToColorCircuit(inputTexture, out redChannel, out greenChannel, out blueChannel, useLog);
+        }
+
+
+        /// <summary>
+        /// Getting a grey scale texture for a given quantum circuit (which should represent an image) directly without using python.
+        /// Is faster than python versions but does not support logarithmic encoding yet and may still contain some errors.
+        /// </summary>
+        /// <param name="quantumCircuit">The quantum circuit with the grey scale image representation</param>
+        /// <param name="width">The width of the image</param>
+        /// <param name="height">The height of the image</param>
+        /// <param name="renormalize">If the image (colors) should be renormalized. (Giving it the highest possible saturation / becomes most light) </param>
+        /// <param name="useLog">If logarithmic encoding is chosen DOES NOTHING (at the moment)</param>
+        /// <returns>A texture showing the encoded image.</returns>
+        public static Texture2D GetGreyTextureDirect(QuantumCircuit quantumCircuit, int width, int height, bool renormalize = false, bool useLog = false)
+        {
+            //TODO Make version with only floats (being faster needing less memory)
+            double[,] imageData = QuantumImageHelper.CircuitToHeight2D(quantumCircuit, width, height, renormalize);
+
+            return QuantumImageHelper.CalculateGreyTexture(imageData);
+        }
+
+
+        /// <summary>
+        /// OLD VERSION use the faster version instead. 
+        /// Getting a colored texture for given quantum circuits (each one representing 1 color channel of an image) directly without using python.
+        /// Is faster than python versions but does not support logarithmic encoding yet and may still contain some errors.
+        /// </summary>
+        /// <param name="redCircuit">The quantum circuit which represents the red channel of the image.</param>
+        /// <param name="greenCircuit">The quantum circuit which represents the green channel of the image.</param>
+        /// <param name="blueCircuit">The quantum circuit which represents the blue channel of the image.</param>
+        /// <param name="width">The width of the image</param>
+        /// <param name="height">The height of the image</param>
+        /// <param name="renormalize">If the image (colors) should be renormalized. (Giving it the highest possible saturation / becomes most light) </param>
+        /// <param name="useLog">If logarithmic encoding is chosen DOES NOTHING (at the moment)</param>
+        /// <returns>A texture showing the encoded image.</returns>
+        public static Texture2D GetColoreTextureDirect(QuantumCircuit redCircuit, QuantumCircuit greenCircuit, QuantumCircuit blueCircuit, int width, int height, bool renormalize = false, bool useLog = false)
+        {
+            double[,] redData = QuantumImageHelper.CircuitToHeight2D(redCircuit, width, height, renormalize);
+            double[,] greenData = QuantumImageHelper.CircuitToHeight2D(greenCircuit, width, height, renormalize);
+            double[,] blueData = QuantumImageHelper.CircuitToHeight2D(blueCircuit, width, height, renormalize);
+
+            return QuantumImageHelper.CalculateColorTexture(redData, greenData, blueData);
+
+        }
+
+        /// <summary>
+        /// Getting a colored texture for given quantum circuits (each one representing 1 color channel of an image) directly without using python.
+        /// Fast version is a lot faster than python versions but does not support logarithmic encoding yet and may still contain some errors.
+        /// </summary>
+        /// <param name="redCircuit">The quantum circuit which represents the red channel of the image.</param>
+        /// <param name="greenCircuit">The quantum circuit which represents the green channel of the image.</param>
+        /// <param name="blueCircuit">The quantum circuit which represents the blue channel of the image.</param>
+        /// <param name="width">The width of the image</param>
+        /// <param name="height">The height of the image</param>
+        /// <param name="renormalize">If the image (colors) should be renormalized. (Giving it the highest possible saturation / becomes most light) </param>
+        /// <param name="useLog">If logarithmic encoding is chosen DOES NOTHING (at the moment)</param>
+        /// <returns>A texture showing the encoded image.</returns>
+        public static Texture2D GetColoreTextureDirectFast(QuantumCircuit redCircuit, QuantumCircuit greenCircuit, QuantumCircuit blueCircuit, int width, int height, bool renormalize = false, bool useLog = false)
+        {
+            return QuantumImageHelper.CalculateColorTexture(redCircuit, greenCircuit, blueCircuit, width, height, renormalize);
+        }
+
+
+        #endregion
+
+
+        //Helper functions, which need python code, thats why they are not exported to QuantumImageHelper
+        #region Internal Helper Functions
+
         IronPython.Runtime.PythonDictionary getBlurDictionaryFromData(out string heightDimensions, double[,] imageData, float rotation, bool useLog = false)
         {
             //dynamic pythonHelper = PythonFile.QuantumBlurHelper("Helper");
-            BlurHelper.SetHeights(imageData, imageData.GetLength(0), imageData.GetLength(1), useLog);
-            BlurHelper.ApplyPartialX(rotation);
+            blurHelper.SetHeights(imageData, imageData.GetLength(0), imageData.GetLength(1), useLog);
+            blurHelper.ApplyPartialX(rotation);
 
-            dynamic circuit = BlurHelper.GetCircuit();
+            dynamic circuit = blurHelper.GetCircuit();
             int numberofQubits = circuit.num_qubits;
             heightDimensions = circuit.name;
 
@@ -288,96 +547,55 @@ namespace QuantumImage
             string[] stringArray = new string[0];
 
             QuantumImageHelper.GetProbabilityArrays(simulator.GetProbabilities(quantumCircuit), numberofQubits, ref doubleArray, ref stringArray);
-            IronPython.Runtime.PythonDictionary dictionary = PythonFile.HeightFromProbabilities(stringArray, doubleArray, doubleArray.Length, heightDimensions, useLog);
+            IronPython.Runtime.PythonDictionary dictionary = pythonFile.HeightFromProbabilities(stringArray, doubleArray, doubleArray.Length, heightDimensions, useLog);
 
             return dictionary;
         }
 
         QuantumCircuit getBlurCircuitFromData(double[,] imageData, float rotation, bool useLog = false)
         {
-            //dynamic pythonHelper = PythonFile.QuantumBlurHelper("Helper");
-            BlurHelper.SetHeights(imageData, imageData.GetLength(0), imageData.GetLength(1), useLog);
+            blurHelper.SetHeights(imageData, imageData.GetLength(0), imageData.GetLength(1), useLog);
             //Applying rotation
-            BlurHelper.ApplyPartialX(rotation);
-            dynamic circuit = BlurHelper.GetCircuit();
+            blurHelper.ApplyPartialX(rotation);
+            dynamic circuit = blurHelper.GetCircuit();
 
             QuantumCircuit quantumCircuit = QuantumImageHelper.ParseCircuit(circuit.data, circuit.num_qubits, circuit.name);
 
             return quantumCircuit;
         }
 
-
-
-        public Texture2D TeleportTexturesGrey(Texture2D inputTexture, Texture2D inputTexture2, double mixture)
+        IronPython.Runtime.PythonDictionary getTeleportDictionaryFromData(out string heightDimensions, double[,] imageData, double[,] imageData2, double mixture, bool normalizeManually = false, bool useLog = false)
         {
-            string heightDimensions;
 
-            Texture2D OutputTexture = new Texture2D(2, 2);
-
-
-            double[,] imageData = QuantumImageHelper.GetGreyHeighArray(inputTexture);
-            double[,] imageData2 = QuantumImageHelper.GetGreyHeighArray(inputTexture2);
-
-
-            Debug.Log("Calculated imagedata");
-
-
-            IronPython.Runtime.PythonDictionary greyDictionary = getTeleportDictionaryFromData(out heightDimensions, imageData, imageData2, mixture);
-
-            OutputTexture = QuantumImageHelper.CalculateGreyTexture(greyDictionary, heightDimensions);
-
-            return OutputTexture;
-        }
-
-
-
-
-
-        IronPython.Runtime.PythonDictionary getTeleportDictionaryFromData(out string heightDimensions, double[,] imageData, double[,] imageData2, double mixture, bool useLog = false)
-        {
-            dynamic pythonHelper = PythonFile.TeleportationHelper("Helper");
-
-            pythonHelper.SetHeights(imageData, imageData2, imageData.GetLength(0), imageData.GetLength(1));
-
-
-
-            pythonHelper.ApplySwap(mixture);
-
-            dynamic circuit = pythonHelper.GetCircuit();
+            blurHelper.SetHeights(imageData, imageData2, imageData.GetLength(0), imageData.GetLength(1));
+            blurHelper.ApplySwap(mixture, useLog, normalizeManually);
+            dynamic circuit = blurHelper.GetCircuit();
 
 
             int numberofQubits = circuit.num_qubits;
-
             heightDimensions = circuit.name;
 
-            Debug.Log(heightDimensions + " is the name ");
-
-
             QuantumCircuit QuantumCircuit = QuantumImageHelper.ParseCircuit(circuit.data, numberofQubits);
-
             MicroQiskitSimulator simulator = new MicroQiskitSimulator();
 
             double[] doubleArray = new double[0];
             string[] stringArray = new string[0];
 
+            double normalization = 0;
+            double[] probs = simulator.GetProbabilities(QuantumCircuit);
 
-            QuantumImageHelper.GetProbabilityArrays(simulator.GetProbabilities(QuantumCircuit), numberofQubits, ref doubleArray, ref stringArray);
+            if (normalizeManually)
+            {
+                normalization = 1.0 / QuantumCircuit.OriginalSum;
+            }
 
-            IronPython.Runtime.PythonDictionary dictionary = PythonFile.CombinedHeightFromProbabilities(stringArray, doubleArray, doubleArray.Length, numberofQubits, heightDimensions, useLog);
+            QuantumImageHelper.GetProbabilityArrays(probs, numberofQubits, ref doubleArray, ref stringArray);
 
-            Debug.Log("Calculated dictionary");
-
-
+            IronPython.Runtime.PythonDictionary dictionary = pythonFile.CombinedHeightFromProbabilities(stringArray, doubleArray, doubleArray.Length, numberofQubits, heightDimensions, useLog, normalization);
             return dictionary;
         }
 
-
-
-
-
-
-
-
+        #endregion
 
         //TODO Make Async work
         /*
