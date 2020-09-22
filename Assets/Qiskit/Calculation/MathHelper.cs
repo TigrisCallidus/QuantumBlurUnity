@@ -12,11 +12,9 @@
 // copyright notice, and modified files need to carry a notice indicating
 // that they have been altered from the originals.using System;
 
-namespace Qiskit
-{
+namespace Qiskit {
     //Simple Helper functions for math.
-    public static class MathHelper
-    {
+    public static class MathHelper {
         //Constants (potential) used
         public const double Pi = 3.1415926535897932384626433832795;
         public const double PiHalf = 1.5707963267948966192313216916398;
@@ -31,13 +29,10 @@ namespace Qiskit
         /// <param name="baseValue"> The base </param>
         /// <param name="powerValue">The exponent </param>
         /// <returns></returns>
-        public static int IntegerPower(int baseValue, int powerValue)
-        {
+        public static int IntegerPower(int baseValue, int powerValue) {
             int returnValue = 1;
-            while (powerValue != 0)
-            {
-                if ((powerValue & 1) == 1)
-                {
+            while (powerValue != 0) {
+                if ((powerValue & 1) == 1) {
                     returnValue *= baseValue;
                 }
                 baseValue *= baseValue;

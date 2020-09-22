@@ -19,10 +19,9 @@ using SimpleFileBrowser;
 using UnityEngine.UI;
 using QuantumImage;
 
-public class QuantumBlurUnity : MonoBehaviour
-{
+public class QuantumBlurUnity : MonoBehaviour {
 
-    [Tooltip("The image used for the blur effect and the first image used for teleportation.")] 
+    [Tooltip("The image used for the blur effect and the first image used for teleportation.")]
     public Texture2D InputTexture1;
 
     [Tooltip("The 2nd image used for teleportation.")]
@@ -64,6 +63,8 @@ public class QuantumBlurUnity : MonoBehaviour
     [HideInInspector]
     public RawImage OutputImage;
     [HideInInspector]
+    public RawImage OutputImage2;
+    [HideInInspector]
     public RawImage MixedImage;
     [HideInInspector]
     public GameObject LoadingSign;
@@ -83,28 +84,23 @@ public class QuantumBlurUnity : MonoBehaviour
     //To cash the creator not having to create it each time.
     QuantumImageCreator creator;
     //Change only for testing (when you want to change the python file)
-    bool RefreshCreator = false;
+    bool RefreshCreator = true;
 
 
     /// <summary>
     /// Creating a blurred image of the Input Texture and safe it to the Output Texture.
     /// Rotation should be between 0 and 1 where 0 is no blur and 1 is maximum blur.
     /// </summary>
-    public void CreateBlur()
-    {
-        if (creator == null || RefreshCreator)
-        {
+    public void CreateBlur() {
+        if (creator == null || RefreshCreator) {
             creator = new QuantumImageCreator();
         }
 
         bool differentDecoding = !UseLogarithmicEncoding && UseOnlyLogarithmicDecoding;
 
-        if (ColoredImage)
-        {
-            OutputTexture = creator.CreateBlurTextureColor(InputTexture1, Rotation*Mathf.PI, UseLogarithmicEncoding, differentDecoding);
-        }
-        else
-        {
+        if (ColoredImage) {
+            OutputTexture = creator.CreateBlurTextureColor(InputTexture1, Rotation * Mathf.PI, UseLogarithmicEncoding, differentDecoding);
+        } else {
             OutputTexture = creator.CreateBlurTextureGrey(InputTexture1, Rotation * Mathf.PI, UseLogarithmicEncoding, differentDecoding);
         }
     }
@@ -115,45 +111,44 @@ public class QuantumBlurUnity : MonoBehaviour
     /// Having percentage 0.5 means it is halfway between both images.
     /// The images should have the same size.
     /// </summary>
-    public void Teleport()
-    {
-        if (creator == null || RefreshCreator)
-        {
+    public void Teleport() {
+        if (creator == null || RefreshCreator) {
             creator = new QuantumImageCreator();
         }
 
-        OutputTexture = creator.TeleportTexturesGreyPartByPart(InputTexture1, InputTexture2, TeleportPercentage);
+        if (ColoredImage) {
+            OutputTexture = creator.TeleportTexturesColoredPartByPart(InputTexture1, InputTexture2, TeleportPercentage);
+
+        } else {
+            OutputTexture = creator.TeleportTexturesGreyPartByPart(InputTexture1, InputTexture2, TeleportPercentage);
+        }
+
     }
 
 
     #region FileBrowser
 
-    public void SaveFileDirect()
-    {
+    public void SaveFileDirect() {
         string path = Path.Combine(Application.dataPath, FolderName, FileName + ".png");
         File.WriteAllBytes(path, OutputTexture.EncodeToPNG());
     }
 
-    public void LoadPNG()
-    {
+    public void LoadPNG() {
         FileBrowser.SetFilters(false, ".png");
         FileBrowser.ShowLoadDialog(loadPNGFromFile, onCancel, false, false, Application.dataPath);
     }
 
-    public void LoadPNG2()
-    {
+    public void LoadPNG2() {
         FileBrowser.SetFilters(false, ".png");
         FileBrowser.ShowLoadDialog(loadPNGFromFile2, onCancel, false, false, Application.dataPath);
     }
 
-    void loadPNGFromFile(string filePath, bool isInput2=false)
-    {
+    void loadPNGFromFile(string filePath, bool isInput2 = false) {
 
         Texture2D texture = null;
         byte[] data;
 
-        if (File.Exists(filePath) && filePath.EndsWith(".png"))
-        {
+        if (File.Exists(filePath) && filePath.EndsWith(".png")) {
             string[] names = filePath.Split('\\');
             string fileName = names[names.Length - 1];
 
@@ -163,45 +158,37 @@ public class QuantumBlurUnity : MonoBehaviour
             texture.name = fileName;
             //The correct size will be set correctly here
             texture.LoadImage(data);
-            if (!isInput2)
-            {
+            if (!isInput2) {
                 InputTexture1 = texture;
-            }
-            else
-            {
+            } else {
                 InputTexture2 = texture;
             }
         }
     }
 
     //Needed for file browser
-    void loadPNGFromFile(string[] filePaths)
-    {
+    void loadPNGFromFile(string[] filePaths) {
         loadPNGFromFile(filePaths[0]);
         InputImage.texture = InputTexture1;
     }
 
-    void loadPNGFromFile2(string[] filePaths)
-    {
-        loadPNGFromFile(filePaths[0],true);
+    void loadPNGFromFile2(string[] filePaths) {
+        loadPNGFromFile(filePaths[0], true);
         InputImage2.texture = InputTexture2;
     }
 
-    public void SaveFile()
-    {
+    public void SaveFile() {
         FileBrowser.ShowSaveDialog(safeFile, onCancel);
     }
 
-    void safeFile(string[] files)
-    {
+    void safeFile(string[] files) {
         string path = files[0];
         File.WriteAllBytes(path, OutputTexture.EncodeToPNG());
 
     }
 
     //Needed for file browser
-    void onCancel()
-    {
+    void onCancel() {
         Debug.Log("Request got cancelled");
     }
 
@@ -214,91 +201,75 @@ public class QuantumBlurUnity : MonoBehaviour
     bool isBlurMode = true;
 
 
-    public void ApplyBlur()
-    {
+    public void ApplyBlur() {
         StartCoroutine(applyBlur());
     }
 
     //used to show loading indicator
-    IEnumerator applyBlur()
-    {
+    IEnumerator applyBlur() {
         LoadingSign?.SetActive(true);
         yield return null;
         CreateBlur();
-        if (OutputImage != null)
-        {
+        if (OutputImage != null) {
             OutputImage.texture = OutputTexture;
         }
         yield return null;
         LoadingSign?.SetActive(false);
     }
 
-    public void ApplyTeleport()
-    {
+    public void ApplyTeleport() {
         StartCoroutine(applyTeleport());
 
     }
 
     //used to show loading indicator
-    IEnumerator applyTeleport()
-    {
+    IEnumerator applyTeleport() {
         LoadingSign?.SetActive(true);
         yield return null;
         Teleport();
-        if (OutputImage != null)
-        {
-            OutputImage.texture = OutputTexture;
+        if (OutputImage != null) {
+            OutputImage2.texture = OutputTexture;
         }
         yield return null;
         LoadingSign?.SetActive(false);
     }
 
-    public void RotationSet(string rotation)
-    {
+    public void RotationSet(string rotation) {
         //Debug.Log(rotation);
         Rotation = float.Parse(rotation);
     }
 
-    public void RotationSet(float rotation)
-    {
+    public void RotationSet(float rotation) {
         //Debug.Log(rotation);
         Rotation = rotation;
         RotationPercentage.text = Mathf.RoundToInt(rotation * 100) + " %";
     }
 
-    public void LograithmicSet(bool logarithmic)
-    {
+    public void LograithmicSet(bool logarithmic) {
         UseLogarithmicEncoding = logarithmic;
     }
 
-    public void SetDiffferentDecodigung(bool differentDecoding)
-    {
+    public void SetDiffferentDecodigung(bool differentDecoding) {
         UseOnlyLogarithmicDecoding = differentDecoding;
     }
 
-    public void ColoredSet(bool colored)
-    {
+    public void ColoredSet(bool colored) {
         ColoredImage = colored;
     }
 
-    public void PercentageSet(float percentage)
-    {
+    public void PercentageSet(float percentage) {
         TeleportPercentage = percentage;
-        Percentage1.text = Mathf.RoundToInt(TeleportPercentage * 100) + "%";
-        Percentage2.text = Mathf.RoundToInt((1 - TeleportPercentage) * 100) + "%";
+        Percentage1.text = Mathf.RoundToInt((1 - TeleportPercentage) * 100) + "%";
+        Percentage2.text = Mathf.RoundToInt((TeleportPercentage) * 100) + "%";
     }
 
-    public void SwitchMode()
-    {
+    public void SwitchMode() {
         isBlurMode = !isBlurMode;
 
-        if (isBlurMode)
-        {
+        if (isBlurMode) {
             BlurMode?.SetActive(true);
             TeleportationMode?.SetActive(false);
-        }
-        else
-        {
+        } else {
             BlurMode?.SetActive(false);
             TeleportationMode?.SetActive(true);
 

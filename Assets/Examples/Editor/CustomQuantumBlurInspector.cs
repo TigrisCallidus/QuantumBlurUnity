@@ -34,37 +34,31 @@ public class CustomQuantumBlurInspector : Editor {
         // Spawn buttons
 
 
-        if (GUILayout.Button("Create blurred image using quantum blur"))
-        {
+        if (GUILayout.Button("Create blurred image using quantum blur")) {
             targetTest.CreateBlur();
         }
 
-        if (GUILayout.Button("Mix the 2 images using teleportation"))
-        {
+        if (GUILayout.Button("Mix the 2 images using teleportation")) {
             targetTest.Teleport();
         }
 
-        if (GUILayout.Button("Load File as InputTexture"))
-        {
+        if (GUILayout.Button("Load File as InputTexture")) {
             targetTest.LoadPNG();
         }
 
 
-        if (GUILayout.Button("Load File as InputTexture2"))
-        {
+        if (GUILayout.Button("Load File as InputTexture2")) {
             targetTest.LoadPNG2();
         }
 
-        if (GUILayout.Button("Save Output Texture to specific file directly"))
-        {
+        if (GUILayout.Button("Save Output Texture to specific file directly")) {
             targetTest.SaveFileDirect();
             AssetDatabase.Refresh();
 
         }
 
 
-        if (GUILayout.Button("Save Output Texture to file using file browser"))
-        {
+        if (GUILayout.Button("Save Output Texture to file using file browser")) {
             targetTest.SaveFile();
         }
 

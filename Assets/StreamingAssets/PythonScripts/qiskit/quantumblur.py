@@ -387,6 +387,8 @@ def probs2height(probs, size=None, log=False, max_h=0):
     # set height to probs value, rescaled such that the maximum is 1
     if max_h==0:
         max_h = max( probs.values() )   
+    else:
+        max_h = max( probs.values() )/max_h
     height = {(x,y):0.0 for x in range(Lx) for y in range(Ly)}
     for bitstring in probs:
         if bitstring in grid:
@@ -643,7 +645,6 @@ def swap_heights2circuit(height0, height1, fraction, log=False, normalizeManuall
     "Objects to be swapped are not the same size"   
     
     # set up the circuit to be run
-    #circuits = [height2circuit(height, False, normalizeManually) for height in [height0,height1]]
     
     circuit0=height2circuit(height0, False, normalizeManually)
     circuit1=height2circuit(height1, False, normalizeManually)

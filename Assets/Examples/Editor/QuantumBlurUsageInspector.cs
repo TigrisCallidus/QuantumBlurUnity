@@ -34,25 +34,30 @@ public class QuantumBlurUsageInspector : Editor {
         // Spawn buttons
 
 
-        if (GUILayout.Button("Apply Simple Blur"))
-        {
-            targetTest.OutputTexture=targetTest.CalculateSimpleBlur(targetTest.InputTexture, targetTest.Rotation, targetTest.LogarithmicEncoding);
+        if (GUILayout.Button("Apply Simple Blur")) {
+            targetTest.OutputTexture = targetTest.CalculateSimpleBlur(targetTest.InputTexture, targetTest.Rotation, targetTest.LogarithmicEncoding);
         }
 
-        if (GUILayout.Button("Apply Simple Half Blur"))
-        {
+        if (GUILayout.Button("Apply Simple Half Blur")) {
             targetTest.OutputTexture = targetTest.CalculateSimpleHalfBlur(targetTest.InputTexture, targetTest.Rotation, targetTest.LogarithmicEncoding);
         }
 
-        if (GUILayout.Button("Apply Unity Blur"))
-        {
+        if (GUILayout.Button("Apply Unity Blur")) {
             targetTest.OutputTexture = targetTest.CalculateUnityBlur(targetTest.InputTexture, targetTest.Rotation);
         }
 
-        if (GUILayout.Button("Apply your own image effect"))
-        {
+        if (GUILayout.Button("Apply your own image effect")) {
             targetTest.OutputTexture = targetTest.CalculateMyOwnEffect(targetTest.InputTexture);
         }
+
+        if (GUILayout.Button("Blur Mesh effect")) {
+            targetTest.TransformMesh();
+        }
+
+        if (GUILayout.Button("Do Mesh Animation")) {
+            targetTest.DoMeshAnimation();
+        }
+
     }
 
 

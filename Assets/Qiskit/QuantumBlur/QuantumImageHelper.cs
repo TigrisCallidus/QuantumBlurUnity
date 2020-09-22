@@ -18,8 +18,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace QuantumImage
-{
+namespace QuantumImage {
 
 
     /// <summary>
@@ -27,20 +26,16 @@ namespace QuantumImage
     /// This class is kinda not meant to be changed or looked at to much (idealy a user of this unity package never have to go to this class).
     /// Due to some optimization some functionality is several times included (and some functions are not (yet or not anymore) used.
     /// </summary>
-    public static class QuantumImageHelper
-    {
+    public static class QuantumImageHelper {
 
-        public static double[,] GetGreyHeighArray(Texture2D tex)
-        {
+        public static double[,] GetGreyHeighArray(Texture2D tex) {
 
             int width = tex.width;
             int height = tex.height;
 
             double[,] returnValue = new double[width, height];
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
                     returnValue[x, y] = tex.GetPixel(x, y).r;
                 }
             }
@@ -48,45 +43,35 @@ namespace QuantumImage
             return returnValue;
         }
 
-        public static double[,] GetPartialHeightArray(Texture2D tex, ColorChannel channel = ColorChannel.R, int startWidth = 0, int startHeight = 0, int totalWidth = 8, int totalHeight = 8)
-        {
+        public static double[,] GetPartialHeightArray(Texture2D tex, ColorChannel channel = ColorChannel.R, int startWidth = 0, int startHeight = 0, int totalWidth = 8, int totalHeight = 8) {
 
             double[,] returnValue = new double[totalWidth, totalHeight];
 
-            switch (channel)
-            {
+            switch (channel) {
                 case ColorChannel.R:
-                    for (int x = startWidth; x < startWidth + totalWidth; x++)
-                    {
-                        for (int y = startHeight; y < startHeight + totalHeight; y++)
-                        {
+                    for (int x = startWidth; x < startWidth + totalWidth; x++) {
+                        for (int y = startHeight; y < startHeight + totalHeight; y++) {
                             returnValue[x, y] = tex.GetPixel(x, y).r;
                         }
                     }
                     break;
                 case ColorChannel.G:
-                    for (int x = startWidth; x < startWidth + totalWidth; x++)
-                    {
-                        for (int y = startHeight; y < startHeight + totalHeight; y++)
-                        {
+                    for (int x = startWidth; x < startWidth + totalWidth; x++) {
+                        for (int y = startHeight; y < startHeight + totalHeight; y++) {
                             returnValue[x, y] = tex.GetPixel(x, y).g;
                         }
                     }
                     break;
                 case ColorChannel.B:
-                    for (int x = startWidth; x < startWidth + totalWidth; x++)
-                    {
-                        for (int y = startHeight; y < startHeight + totalHeight; y++)
-                        {
+                    for (int x = startWidth; x < startWidth + totalWidth; x++) {
+                        for (int y = startHeight; y < startHeight + totalHeight; y++) {
                             returnValue[x, y] = tex.GetPixel(x, y).b;
                         }
                     }
                     break;
                 case ColorChannel.A:
-                    for (int x = startWidth; x < startWidth + totalWidth; x++)
-                    {
-                        for (int y = startHeight; y < startHeight + totalHeight; y++)
-                        {
+                    for (int x = startWidth; x < startWidth + totalWidth; x++) {
+                        for (int y = startHeight; y < startHeight + totalHeight; y++) {
                             returnValue[x, y] = tex.GetPixel(x, y).a;
                         }
                     }
@@ -98,96 +83,95 @@ namespace QuantumImage
         }
 
 
-        public static void FillPartialHeightArray(Texture2D tex, double[,] imageData, ColorChannel channel = ColorChannel.R, int startWidth = 0, int startHeight = 0, int totalWidth = 8, int totalHeight = 8)
-        {
+        public static double FillPartialHeightArray(Texture2D tex, double[,] imageData, ColorChannel channel = ColorChannel.R, int startWidth = 0, int startHeight = 0, int totalWidth = 8, int totalHeight = 8) {
+            double max = 0;
+            double value = 0;
 
-            switch (channel)
-            {
+            switch (channel) {
                 case ColorChannel.R:
-                    for (int x = 0; x < totalWidth; x++)
-                    {
-                        for (int y = 0; y < totalHeight; y++)
-                        {
-                            imageData[x, y] = tex.GetPixel(x + startWidth, y + startHeight).r + MathHelper.Eps;
+                    for (int x = 0; x < totalWidth; x++) {
+                        for (int y = 0; y < totalHeight; y++) {
+                            value = tex.GetPixel(x + startWidth, y + startHeight).r + MathHelper.Eps;
+                            imageData[x, y] = value;
+                            if (value > max) {
+                                max = value;
+                            }
                         }
                     }
                     break;
                 case ColorChannel.G:
-                    for (int x = 0; x < totalWidth; x++)
-                    {
-                        for (int y = 0; y < totalHeight; y++)
-                        {
-                            imageData[x, y] = tex.GetPixel(x + startWidth, y + startHeight).g + MathHelper.Eps;
+                    for (int x = 0; x < totalWidth; x++) {
+                        for (int y = 0; y < totalHeight; y++) {
+                            value = tex.GetPixel(x + startWidth, y + startHeight).g + MathHelper.Eps;
+                            imageData[x, y] = value;
+                            if (value > max) {
+                                max = value;
+                            }
                         }
                     }
                     break;
                 case ColorChannel.B:
-                    for (int x = 0; x < totalWidth; x++)
-                    {
-                        for (int y = 0; y < totalHeight; y++)
-                        {
-                            imageData[x, y] = tex.GetPixel(x + startWidth, y + startHeight).b + MathHelper.Eps;
+                    for (int x = 0; x < totalWidth; x++) {
+                        for (int y = 0; y < totalHeight; y++) {
+                            value = tex.GetPixel(x + startWidth, y + startHeight).b + MathHelper.Eps;
+                            imageData[x, y] = value;
+                            if (value > max) {
+                                max = value;
+                            }
                         }
                     }
                     break;
                 case ColorChannel.A:
-                    for (int x = 0; x < totalWidth; x++)
-                    {
-                        for (int y = 0; y < totalHeight; y++)
-                        {
-                            imageData[x, y] = tex.GetPixel(x + startWidth, y + startHeight).a + MathHelper.Eps;
+                    for (int x = 0; x < totalWidth; x++) {
+                        for (int y = 0; y < totalHeight; y++) {
+                            value = tex.GetPixel(x + startWidth, y + startHeight).a + MathHelper.Eps;
+                            imageData[x, y] = value;
+                            if (value > max) {
+                                max = value;
+                            }
                         }
                     }
                     break;
                 default:
                     break;
             }
+            return max;
         }
 
 
         //TODO also making quantum circuit which uses floats
-        public static float[,] GetHeightArrayFloat(Texture2D tex, ColorChannel channel = ColorChannel.R)
-        {
+        public static float[,] GetHeightArrayFloat(Texture2D tex, ColorChannel channel = ColorChannel.R) {
             int width = tex.width;
             int height = tex.height;
 
             float[,] returnValue = new float[width, height];
 
 
-            switch (channel)
-            {
+            switch (channel) {
                 case ColorChannel.R:
-                    for (int x = 0; x < width; x++)
-                    {
-                        for (int y = 0; y < height; y++)
-                        {
+                    for (int x = 0; x < width; x++) {
+                        for (int y = 0; y < height; y++) {
                             returnValue[x, y] = tex.GetPixel(x, y).r;
                         }
                     }
                     break;
                 case ColorChannel.G:
-                    for (int x = 0; x < width; x++)
-                    {
-                        for (int y = 0; y < height; y++)
-                        {
+                    for (int x = 0; x < width; x++) {
+                        for (int y = 0; y < height; y++) {
                             returnValue[x, y] = tex.GetPixel(x, y).g;
                         }
                     }
                     break;
                 case ColorChannel.B:
-                    for (int x = 0; x < width; x++)
-                    {
-                        for (int y = 0; y < height; y++)
-                        {
+                    for (int x = 0; x < width; x++) {
+                        for (int y = 0; y < height; y++) {
                             returnValue[x, y] = tex.GetPixel(x, y).b;
                         }
                     }
                     break;
                 case ColorChannel.A:
-                    for (int x = 0; x < width; x++)
-                    {
-                        for (int y = 0; y < height; y++)
-                        {
+                    for (int x = 0; x < width; x++) {
+                        for (int y = 0; y < height; y++) {
                             returnValue[x, y] = tex.GetPixel(x, y).a;
                         }
                     }
@@ -198,48 +182,38 @@ namespace QuantumImage
             return returnValue;
         }
 
-        public static double[,] GetHeightArrayDouble(Texture2D tex, ColorChannel channel = ColorChannel.R)
-        {
+        public static double[,] GetHeightArrayDouble(Texture2D tex, ColorChannel channel = ColorChannel.R) {
             int width = tex.width;
             int height = tex.height;
 
             double[,] returnValue = new double[width, height];
 
 
-            switch (channel)
-            {
+            switch (channel) {
                 case ColorChannel.R:
-                    for (int x = 0; x < width; x++)
-                    {
-                        for (int y = 0; y < height; y++)
-                        {
+                    for (int x = 0; x < width; x++) {
+                        for (int y = 0; y < height; y++) {
                             returnValue[x, y] = tex.GetPixel(x, y).r;
                         }
                     }
                     break;
                 case ColorChannel.G:
-                    for (int x = 0; x < width; x++)
-                    {
-                        for (int y = 0; y < height; y++)
-                        {
+                    for (int x = 0; x < width; x++) {
+                        for (int y = 0; y < height; y++) {
                             returnValue[x, y] = tex.GetPixel(x, y).g;
                         }
                     }
                     break;
                 case ColorChannel.B:
-                    for (int x = 0; x < width; x++)
-                    {
-                        for (int y = 0; y < height; y++)
-                        {
+                    for (int x = 0; x < width; x++) {
+                        for (int y = 0; y < height; y++) {
                             returnValue[x, y] = tex.GetPixel(x, y).b;
                         }
                     }
                     break;
                 case ColorChannel.A:
-                    for (int x = 0; x < width; x++)
-                    {
-                        for (int y = 0; y < height; y++)
-                        {
+                    for (int x = 0; x < width; x++) {
+                        for (int y = 0; y < height; y++) {
                             returnValue[x, y] = tex.GetPixel(x, y).a;
                         }
                     }
@@ -250,64 +224,52 @@ namespace QuantumImage
             return returnValue;
         }
 
-        public static double[,] GetRedHeightArray(Texture2D tex)
-        {
+        public static double[,] GetRedHeightArray(Texture2D tex) {
             int width = tex.width;
             int height = tex.height;
 
             double[,] returnValue = new double[width, height];
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
                     returnValue[x, y] = tex.GetPixel(x, y).r;
                 }
             }
             return returnValue;
         }
 
-        public static double[,] GetGreenHeightArray(Texture2D tex)
-        {
+        public static double[,] GetGreenHeightArray(Texture2D tex) {
             int width = tex.width;
             int height = tex.height;
 
             double[,] returnValue = new double[width, height];
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
                     returnValue[x, y] = tex.GetPixel(x, y).g;
                 }
             }
             return returnValue;
         }
 
-        public static double[,] GetBlueHeightArray(Texture2D tex)
-        {
+        public static double[,] GetBlueHeightArray(Texture2D tex) {
             int width = tex.width;
             int height = tex.height;
 
             double[,] returnValue = new double[width, height];
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
                     returnValue[x, y] = tex.GetPixel(x, y).b;
                 }
             }
             return returnValue;
         }
 
-        public static double[,] GetAlphaHeightArray(Texture2D tex)
-        {
+        public static double[,] GetAlphaHeightArray(Texture2D tex) {
             int width = tex.width;
             int height = tex.height;
 
             double[,] returnValue = new double[width, height];
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
                     returnValue[x, y] = tex.GetPixel(x, y).a;
                 }
             }
@@ -315,109 +277,88 @@ namespace QuantumImage
         }
 
 
-        public static void FillGreyHeighArray(Texture2D tex, double[,] returnValue)
-        {
+        public static void FillGreyHeighArray(Texture2D tex, double[,] returnValue) {
             int width = tex.width;
             int height = tex.height;
 
-            if (returnValue == null || returnValue.GetLength(0) != width || returnValue.GetLength(1) != height)
-            {
+            if (returnValue == null || returnValue.GetLength(0) != width || returnValue.GetLength(1) != height) {
                 Debug.LogError("ReturnValue is null or wrong dimensions");
                 return;
             }
 
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
                     returnValue[x, y] = tex.GetPixel(x, y).r;
                 }
             }
         }
 
-        public static void FillRedHeighArray(Texture2D tex, double[,] returnValue)
-        {
+        public static void FillRedHeighArray(Texture2D tex, double[,] returnValue) {
             int width = tex.width;
             int height = tex.height;
 
-            if (returnValue == null || returnValue.GetLength(0) != width || returnValue.GetLength(1) != height)
-            {
+            if (returnValue == null || returnValue.GetLength(0) != width || returnValue.GetLength(1) != height) {
                 Debug.LogError("ReturnValue is null or wrong dimensions");
                 return;
             }
 
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
                     returnValue[x, y] = tex.GetPixel(x, y).r;
                 }
             }
         }
 
-        public static void FillGreenHeighArray(Texture2D tex, double[,] returnValue)
-        {
+        public static void FillGreenHeighArray(Texture2D tex, double[,] returnValue) {
             int width = tex.width;
             int height = tex.height;
 
-            if (returnValue == null || returnValue.GetLength(0) != width || returnValue.GetLength(1) != height)
-            {
+            if (returnValue == null || returnValue.GetLength(0) != width || returnValue.GetLength(1) != height) {
                 Debug.LogError("ReturnValue is null or wrong dimensions");
                 return;
             }
 
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
                     returnValue[x, y] = tex.GetPixel(x, y).g;
                 }
             }
         }
 
-        public static void FillBlueHeighArray(Texture2D tex, double[,] returnValue)
-        {
+        public static void FillBlueHeighArray(Texture2D tex, double[,] returnValue) {
             int width = tex.width;
             int height = tex.height;
 
-            if (returnValue == null || returnValue.GetLength(0) != width || returnValue.GetLength(1) != height)
-            {
+            if (returnValue == null || returnValue.GetLength(0) != width || returnValue.GetLength(1) != height) {
                 Debug.LogError("ReturnValue is null or wrong dimensions");
                 return;
             }
 
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
                     returnValue[x, y] = tex.GetPixel(x, y).b;
                 }
             }
         }
 
-        public static void FillAlphaHeighArray(Texture2D tex, double[,] returnValue)
-        {
+        public static void FillAlphaHeighArray(Texture2D tex, double[,] returnValue) {
             int width = tex.width;
             int height = tex.height;
 
-            if (returnValue == null || returnValue.GetLength(0) != width || returnValue.GetLength(1) != height)
-            {
+            if (returnValue == null || returnValue.GetLength(0) != width || returnValue.GetLength(1) != height) {
                 Debug.LogError("ReturnValue is null or wrong dimensions");
                 return;
             }
 
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
                     returnValue[x, y] = tex.GetPixel(x, y).a;
                 }
             }
         }
 
 
-        public static QuantumCircuit ParseCircuit(IList<object> pythonList, int numberOfQubits = 0, string dimensions = "")
-        {
+        public static QuantumCircuit ParseCircuit(IList<object> pythonList, int numberOfQubits = 0, string dimensions = "") {
             QuantumCircuit circuit = new QuantumCircuit(numberOfQubits, numberOfQubits, true);
 
             object first = null;
@@ -427,12 +368,10 @@ namespace QuantumImage
             IList<object> elementList;
 
 
-            for (int i = 0; i < pythonList.Count; i++)
-            {
+            for (int i = 0; i < pythonList.Count; i++) {
                 elementList = (IList<object>)pythonList[i];
 
-                switch (elementList.Count)
-                {
+                switch (elementList.Count) {
                     case 0:
                         Debug.LogError("Empty List");
                         break;
@@ -458,13 +397,11 @@ namespace QuantumImage
                         break;
                 }
 
-                switch (first.ToString())
-                {
+                switch (first.ToString()) {
                     case "init":
                         IList<object> doubleList = (IList<object>)second;
 
-                        for (int j = 0; j < doubleList.Count; j++)
-                        {
+                        for (int j = 0; j < doubleList.Count; j++) {
                             circuit.Amplitudes[j].Real = (double)doubleList[j];
                         }
                         break;
@@ -489,8 +426,7 @@ namespace QuantumImage
                         break;
                 }
             }
-            if (dimensions.Length >= 5)
-            {
+            if (dimensions.Length >= 5) {
                 circuit.DimensionString = dimensions;
             }
 
@@ -499,8 +435,7 @@ namespace QuantumImage
 
 
 
-        public static Texture2D CalculateGreyTexture(double[,] imageData)
-        {
+        public static Texture2D CalculateGreyTexture(double[,] imageData) {
             int width = imageData.GetLength(0);
             int height = imageData.GetLength(1);
 
@@ -508,10 +443,8 @@ namespace QuantumImage
 
             float greyValue = 0;
 
-            for (int i = 0; i < width; i++)
-            {
-                for (int j = 0; j < height; j++)
-                {
+            for (int i = 0; i < width; i++) {
+                for (int j = 0; j < height; j++) {
                     greyValue = (float)imageData[i, j];
                     texture.SetPixel(i, j, new Color(greyValue, greyValue, greyValue));
 
@@ -525,8 +458,7 @@ namespace QuantumImage
         }
 
 
-        public static Texture2D CalculateGreyTexture(IronPython.Runtime.PythonDictionary probabilityDict, string dimensions)
-        {
+        public static Texture2D CalculateGreyTexture(IronPython.Runtime.PythonDictionary probabilityDict, string dimensions) {
             Vector2Int dim = ParseVector(dimensions);
             int width = dim.x;
             int height = dim.y;
@@ -534,15 +466,13 @@ namespace QuantumImage
             return CalculateGreyTexture(probabilityDict, width, height);
         }
 
-        public static Texture2D CalculateGreyTexture(IronPython.Runtime.PythonDictionary probabilityDict, int width, int height)
-        {
+        public static Texture2D CalculateGreyTexture(IronPython.Runtime.PythonDictionary probabilityDict, int width, int height) {
             Texture2D texture = new Texture2D(width, height);
 
             Vector2Int position;
             float greyValue;
 
-            foreach (var item in probabilityDict)
-            {
+            foreach (var item in probabilityDict) {
                 position = ParseVector(item.Key.ToString());
                 greyValue = (float)(double)item.Value;
                 texture.SetPixel(position.x, position.y, new Color(greyValue, greyValue, greyValue));
@@ -553,24 +483,36 @@ namespace QuantumImage
         }
 
 
-        public static void FillTextureGrey(IronPython.Runtime.PythonDictionary probabilityDict, Texture2D textureToFill, int startWidth = 0, int startHeight = 0)
-        {
+        public static void FillTextureGrey(IronPython.Runtime.PythonDictionary probabilityDict, Texture2D textureToFill, int startWidth = 0, int startHeight = 0) {
             Vector2Int position;
 
 
             float colorValue;
 
-            foreach (var item in probabilityDict)
-            {
+            foreach (var item in probabilityDict) {
                 position = ParseVector(item.Key.ToString());
                 colorValue = (float)(double)item.Value;
                 textureToFill.SetPixel(position.x + startWidth, position.y + startHeight, new Color(colorValue, colorValue, colorValue));
             }
         }
 
+        public static void FillTextureColored(IronPython.Runtime.PythonDictionary redDict, IronPython.Runtime.PythonDictionary greenDict, IronPython.Runtime.PythonDictionary blueDict, Texture2D textureToFill, int startWidth = 0, int startHeight = 0) {
+            Vector2Int position;
 
-        public static Texture2D CalculateColorTexture(IronPython.Runtime.PythonDictionary redValues, IronPython.Runtime.PythonDictionary greenValues, IronPython.Runtime.PythonDictionary blueValues, string dimensions)
-        {
+
+            float redValue, greenValue, blueValue;
+
+            foreach (var item in redDict) {
+                position = ParseVector(item.Key.ToString());
+                redValue = (float)(double)item.Value;
+                greenValue = (float)(double)greenDict[item.Key];
+                blueValue = (float)(double)blueDict[item.Key];
+                textureToFill.SetPixel(position.x + startWidth, position.y + startHeight, new Color(redValue, greenValue, blueValue));
+            }
+        }
+
+
+        public static Texture2D CalculateColorTexture(IronPython.Runtime.PythonDictionary redValues, IronPython.Runtime.PythonDictionary greenValues, IronPython.Runtime.PythonDictionary blueValues, string dimensions) {
             Vector2Int dim = ParseVector(dimensions);
             int width = dim.x;
             int height = dim.y;
@@ -580,8 +522,7 @@ namespace QuantumImage
             Vector2Int position;
             float redValue, greenValue, blueValue;
 
-            foreach (var item in redValues)
-            {
+            foreach (var item in redValues) {
                 position = ParseVector(item.Key.ToString());
                 redValue = (float)(double)item.Value;
                 greenValue = (float)(double)greenValues[item.Key];
@@ -594,8 +535,7 @@ namespace QuantumImage
         }
 
 
-        public static Texture2D CalculateColorTexture(double[,] redData, double[,] greenData, double[,] blueData)
-        {
+        public static Texture2D CalculateColorTexture(double[,] redData, double[,] greenData, double[,] blueData) {
             int width = redData.GetLength(0);
             int height = redData.GetLength(1);
 
@@ -605,10 +545,8 @@ namespace QuantumImage
             float greenValue;
             float blueValue;
 
-            for (int i = 0; i < width; i++)
-            {
-                for (int j = 0; j < height; j++)
-                {
+            for (int i = 0; i < width; i++) {
+                for (int j = 0; j < height; j++) {
                     redValue = (float)redData[i, j];
                     greenValue = (float)greenData[i, j];
                     blueValue = (float)blueData[i, j];
@@ -621,8 +559,7 @@ namespace QuantumImage
         }
 
 
-        public static Texture2D CalculateColorTexture(QuantumCircuit redCircuit, QuantumCircuit greenCircuit, QuantumCircuit blueCircuit, int width, int height, bool renormalize = false)
-        {
+        public static Texture2D CalculateColorTexture(QuantumCircuit redCircuit, QuantumCircuit greenCircuit, QuantumCircuit blueCircuit, int width, int height, bool renormalize = false) {
 
             Texture2D texture = new Texture2D(width, height);
 
@@ -632,8 +569,7 @@ namespace QuantumImage
             int[] widthLines = MakeLinesInt(widthLog);
             int[] heightLines = widthLines;
 
-            if (height != width)
-            {
+            if (height != width) {
                 heightLog = Mathf.CeilToInt(Mathf.Log(height) / Mathf.Log(2));
                 heightLines = MakeLinesInt(heightLog);
             }
@@ -649,29 +585,21 @@ namespace QuantumImage
             double normalizationGreen = 0;
             double normalizationBlue = 0;
 
-            if (!renormalize && redCircuit.OriginalSum > 0 && greenCircuit.OriginalSum > 0 && blueCircuit.OriginalSum > 0)
-            {
+            if (!renormalize && redCircuit.OriginalSum > 0 && greenCircuit.OriginalSum > 0 && blueCircuit.OriginalSum > 0) {
                 normalizationRed = redCircuit.OriginalSum;
                 normalizationGreen = greenCircuit.OriginalSum;
                 normalizationBlue = blueCircuit.OriginalSum;
-            }
-            else
-            {
-                for (int i = 0; i < width; i++)
-                {
-                    for (int j = 0; j < height; j++)
-                    {
+            } else {
+                for (int i = 0; i < width; i++) {
+                    for (int j = 0; j < height; j++) {
                         int pos = widthLines[i] * height + heightLines[j];
-                        if (redProbs[pos] > normalizationRed)
-                        {
+                        if (redProbs[pos] > normalizationRed) {
                             normalizationRed = redProbs[pos];
                         }
-                        if (greenProbs[pos] > normalizationGreen)
-                        {
+                        if (greenProbs[pos] > normalizationGreen) {
                             normalizationGreen = greenProbs[pos];
                         }
-                        if (blueProbs[pos] > normalizationBlue)
-                        {
+                        if (blueProbs[pos] > normalizationBlue) {
                             normalizationBlue = blueProbs[pos];
                         }
                     }
@@ -688,11 +616,9 @@ namespace QuantumImage
 
             int posX = 0;
 
-            for (int x = 0; x < width; x++)
-            {
+            for (int x = 0; x < width; x++) {
                 posX = widthLines[x] * height;
-                for (int y = 0; y < height; y++)
-                {
+                for (int y = 0; y < height; y++) {
                     int index = posX + heightLines[y];
                     redValue = (float)(redProbs[index] * normalizationRed);
                     greenValue = (float)(greenProbs[index] * normalizationGreen);
@@ -706,28 +632,16 @@ namespace QuantumImage
         }
 
 
-        public static void GetProbabilityArrays(double[] totalProbabilities, int numberOfQubits, ref double[] usedProbabilities, ref string[] usedNames)
-        {
+        public static void GetProbabilityArrays(double[] totalProbabilities, int numberOfQubits, ref double[] usedProbabilities, ref string[] usedNames) {
             List<double> usedProbabilityList = new List<double>();
             List<string> usedNameList = new List<string>();
 
-            string[] prefixes = CalculatePrefixStrings(numberOfQubits);/* = new string[numberOfQubits + 1];
+            string[] prefixes = CalculatePrefixStrings(numberOfQubits);
 
-        string prefix = "";
+            string binary = "";
 
-        for (int i = numberOfQubits; i >= 0; i--)
-        {
-            prefixes[i] = prefix;
-            prefix += "0";
-        }
-        */
-
-            string binary = "";//= Convert.ToString(value, 2);
-
-            for (int i = 0; i < totalProbabilities.Length; i++)
-            {
-                if (totalProbabilities[i] > 0)
-                {
+            for (int i = 0; i < totalProbabilities.Length; i++) {
+                if (totalProbabilities[i] > 0) {
                     usedProbabilityList.Add(totalProbabilities[i]);
                     binary = Convert.ToString(i, 2);
                     binary = prefixes[binary.Length] + binary;
@@ -736,48 +650,31 @@ namespace QuantumImage
             }
 
             //If all probabilities are used and array has correct size, do not make a new array
-            if (usedProbabilities.Length == usedProbabilityList.Count && usedProbabilityList.Count == totalProbabilities.Length)
-            {
-                for (int i = 0; i < usedProbabilityList.Count; i++)
-                {
+            if (usedProbabilities.Length == usedProbabilityList.Count && usedProbabilityList.Count == totalProbabilities.Length) {
+                for (int i = 0; i < usedProbabilityList.Count; i++) {
                     usedProbabilities[i] = usedProbabilityList[i];
                 }
-            }
-            else
-            {
+            } else {
                 usedProbabilities = usedProbabilityList.ToArray();
             }
 
-            if (usedNames.Length == usedNameList.Count && usedNameList.Count == totalProbabilities.Length && usedNames[0] == usedNameList[0])
-            {
+            if (usedNames.Length == usedNameList.Count && usedNameList.Count == totalProbabilities.Length && usedNames[0] == usedNameList[0]) {
                 //To nothing correct strings should already be there
-            }
-            else
-            {
+            } else {
                 usedNames = usedNameList.ToArray();
             }
 
         }
 
-        public static string[] CalculateNameStrings(int numberOfProbabilities, int numberOfQubits)
-        {
+        public static string[] CalculateNameStrings(int numberOfProbabilities, int numberOfQubits) {
             string[] generatedNames = new string[numberOfProbabilities];
 
-            string[] prefixes = CalculatePrefixStrings(numberOfQubits);/* = new string[numberOfQubits + 1];
+            string[] prefixes = CalculatePrefixStrings(numberOfQubits);
 
-        string prefix = "";
-
-        for (int i = numberOfQubits; i >= 0; i--)
-        {
-            prefixes[i] = prefix;
-            prefix += "0";
-        }
-        */
             string binary = "";//= Convert.ToString(value, 2);
 
 
-            for (int i = 0; i < numberOfProbabilities; i++)
-            {
+            for (int i = 0; i < numberOfProbabilities; i++) {
 
                 binary = Convert.ToString(i, 2);
                 binary = prefixes[binary.Length] + binary;
@@ -789,8 +686,7 @@ namespace QuantumImage
 
 
 
-        public static Vector2Int ParseVector(string vector)
-        {
+        public static Vector2Int ParseVector(string vector) {
             string[] temp = vector.Substring(1, vector.Length - 2).Split(',');
 
             int x = System.Convert.ToInt32(temp[0]);
@@ -802,28 +698,20 @@ namespace QuantumImage
 
 
         //May not be used at the moment
-        public static Texture2D CalculateGreyTexture(double[] probabilities, int width, int height, double max = 0)
-        {
+        public static Texture2D CalculateGreyTexture(double[] probabilities, int width, int height, double max = 0) {
             Texture2D texture = new Texture2D(width, height);
 
-            if (probabilities.Length != width * height)
-            {
-                if (probabilities.Length < width * height)
-                {
+            if (probabilities.Length != width * height) {
+                if (probabilities.Length < width * height) {
                     Debug.LogError("probability array to long");
-                }
-                else
-                {
+                } else {
                     Debug.LogWarning("probability array to long");
                 }
             }
 
-            if (max == 0)
-            {
-                for (int i = 0; i < probabilities.Length; i++)
-                {
-                    if (probabilities[i] > max)
-                    {
+            if (max == 0) {
+                for (int i = 0; i < probabilities.Length; i++) {
+                    if (probabilities[i] > max) {
                         max = probabilities[i];
                     }
                 }
@@ -836,10 +724,8 @@ namespace QuantumImage
 
 
             int count = 0;
-            for (int i = 0; i < height; i++)
-            {
-                for (int j = 0; j < width; j++)
-                {
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
                     float grey = (float)(scaling * probabilities[count]);
                     Debug.Log("Grey is: " + grey);
                     texture.SetPixel(i, j, new Color(grey, grey, grey));
@@ -851,8 +737,7 @@ namespace QuantumImage
             return texture;
         }
 
-        public static string[] MakeLines(int length)
-        {
+        public static string[] MakeLines(int length) {
             //todo using shift optimazation
             int lineLength = Mathf.CeilToInt(Mathf.Log(length) / Mathf.Log(2));
 
@@ -862,8 +747,7 @@ namespace QuantumImage
 
             int[] intLines = MakeLinesInt(lineLength);
 
-            for (int i = 0; i < intLines.Length; i++)
-            {
+            for (int i = 0; i < intLines.Length; i++) {
                 string binary = Convert.ToString(intLines[i], 2);
                 returnValue[i] = prefixes[binary.Length] + binary;
             }
@@ -872,13 +756,16 @@ namespace QuantumImage
 
         }
 
-        public static int[] MakeLinesInt(int length)
-        {
+        /// <summary>
+        /// We create a binary representation (stored as an int) for all the numbers up to the next bigger power of 2 (2,4,8,16...) of the length
+        /// The binary representation are made in a way such that two neighbouring numbers (7,8 or 2,3 etc.) only differ in 1 bit in the representation.
+        /// We use ints for this representation in order to use them directly as indices for arrays.
+        /// </summary>
+        /// <param name="length"></param>
+        /// <returns>Integer array consisting of the binary representation of the encoding</returns>
+        public static int[] MakeLinesInt(int length) {
 
-            //TODO make direct calculation
-
-            //int linelength = Mathf.CeilToInt(Mathf.Log(length) / Mathf.Log(2));
-
+            //TODO make direct calculation (not needing an array)
 
             int[] returnValue = new int[MathHelper.IntegerPower(2, length)];
 
@@ -888,11 +775,9 @@ namespace QuantumImage
             returnValue[0] = 0;
             returnValue[1] = 1;
 
-            for (int i = 0; i < length - 1; i++)
-            {
+            for (int i = 0; i < length - 1; i++) {
                 int count = 0;
-                for (int j = currentLength - 1; j >= 0; j--)
-                {
+                for (int j = currentLength - 1; j >= 0; j--) {
                     returnValue[j + currentLength] = returnValue[count] + currValue;
                     count++;
                 }
@@ -903,14 +788,12 @@ namespace QuantumImage
             return returnValue;
         }
 
-        public static string[] CalculatePrefixStrings(int length)
-        {
+        public static string[] CalculatePrefixStrings(int length) {
             string[] prefixes = new string[length + 1];
 
             string prefix = "";
 
-            for (int i = length; i >= 0; i--)
-            {
+            for (int i = length; i >= 0; i--) {
                 prefixes[i] = prefix;
                 prefix += "0";
             }
@@ -918,8 +801,7 @@ namespace QuantumImage
             return prefixes;
         }
 
-        public static QuantumCircuit HeightToCircuit(double[] height)
-        {
+        public static QuantumCircuit HeightToCircuit(double[] height) {
             int numberOfQubits = Mathf.CeilToInt(Mathf.Log(height.Length) / Mathf.Log(2));
 
             int[] lines = MakeLinesInt(numberOfQubits);
@@ -928,8 +810,7 @@ namespace QuantumImage
 
             int length = height.Length;
 
-            for (int i = 0; i < length; i++)
-            {
+            for (int i = 0; i < length; i++) {
                 circuit.Amplitudes[lines[i]].Real = Math.Sqrt(height[i]);
             }
 
@@ -937,8 +818,7 @@ namespace QuantumImage
             return circuit;
         }
 
-        public static QuantumCircuit HeightToCircuit(float[] height)
-        {
+        public static QuantumCircuit HeightToCircuit(float[] height) {
             int numberOfQubits = Mathf.CeilToInt(Mathf.Log(height.Length) / Mathf.Log(2));
 
             int[] lines = MakeLinesInt(numberOfQubits);
@@ -947,8 +827,7 @@ namespace QuantumImage
 
             int length = height.Length;
 
-            for (int i = 0; i < length; i++)
-            {
+            for (int i = 0; i < length; i++) {
                 circuit.Amplitudes[lines[i]].Real = Math.Sqrt(height[i]);
             }
 
@@ -957,24 +836,19 @@ namespace QuantumImage
         }
 
 
-        public static QuantumCircuit HeightToCircuit(double[,] heights2D)
-        {
-            //int numberOfQubits = Mathf.CeilToInt(Mathf.Log(heights.Length) / Mathf.Log(2));
+        public static QuantumCircuit HeightToCircuit(double[,] heights2D) {
 
             int width = heights2D.GetLength(0);
             int height = heights2D.GetLength(1);
-
 
             int dimX = Mathf.CeilToInt(Mathf.Log(width) / Mathf.Log(2));
             int[] linesWidth = MakeLinesInt(dimX);
 
             int dimY = dimX;
 
-
             int[] linesHeight = linesWidth;
 
-            if (width != height)
-            {
+            if (width != height) {
                 dimY = Mathf.CeilToInt(Mathf.Log(height) / Mathf.Log(2));
                 linesHeight = MakeLinesInt(dimY);
 
@@ -985,13 +859,8 @@ namespace QuantumImage
 
             QuantumCircuit circuit = new QuantumCircuit(numberOfQubits, numberOfQubits, true);
 
-            //Debug.Log("Width: " + width + " height: " + height + " dimX: " + dimX  + " dimY: " + dimY + " maxheight: " + maxHeight);
-
-
-            for (int i = 0; i < width; i++)
-            {
-                for (int j = 0; j < height; j++)
-                {
+            for (int i = 0; i < width; i++) {
+                for (int j = 0; j < height; j++) {
                     int index = linesWidth[i] * maxHeight + linesHeight[j];
                     circuit.Amplitudes[index].Real = Math.Sqrt(heights2D[i, j]);
                 }
@@ -1002,8 +871,7 @@ namespace QuantumImage
         }
 
 
-        public static void TextureToColorCircuit(Texture2D inputTexture, out QuantumCircuit redCircuit, out QuantumCircuit greenCircuit, out QuantumCircuit blueCircuit, bool useLog = false)
-        {
+        public static void TextureToColorCircuit(Texture2D inputTexture, out QuantumCircuit redCircuit, out QuantumCircuit greenCircuit, out QuantumCircuit blueCircuit, bool useLog = false) {
             int width = inputTexture.width;
             int height = inputTexture.height;
 
@@ -1014,8 +882,7 @@ namespace QuantumImage
             int dimY = dimX;
             int[] linesHeight = linesWidth;
 
-            if (width != height)
-            {
+            if (width != height) {
                 dimY = Mathf.CeilToInt(Mathf.Log(height) / Mathf.Log(2));
                 linesHeight = MakeLinesInt(dimY);
 
@@ -1033,11 +900,9 @@ namespace QuantumImage
             int index;
             int posX;
 
-            for (int x = 0; x < width; x++)
-            {
+            for (int x = 0; x < width; x++) {
                 posX = linesWidth[x] * maxHeight;
-                for (int y = 0; y < height; y++)
-                {
+                for (int y = 0; y < height; y++) {
                     index = posX + linesHeight[y];
                     color = inputTexture.GetPixel(x, y);
 
@@ -1054,10 +919,7 @@ namespace QuantumImage
         }
 
 
-        public static QuantumCircuit HeightToCircuit(float[,] heights2D)
-        {
-            //int numberOfQubits = Mathf.CeilToInt(Mathf.Log(heights.Length) / Mathf.Log(2));
-
+        public static QuantumCircuit HeightToCircuit(float[,] heights2D) {
             int width = heights2D.GetLength(0);
             int height = heights2D.GetLength(1);
 
@@ -1070,8 +932,7 @@ namespace QuantumImage
 
             int[] linesHeight = linesWidth;
 
-            if (width != height)
-            {
+            if (width != height) {
                 dimY = Mathf.CeilToInt(Mathf.Log(height) / Mathf.Log(2));
                 linesHeight = MakeLinesInt(dimY);
 
@@ -1082,16 +943,12 @@ namespace QuantumImage
 
             QuantumCircuit circuit = new QuantumCircuit(numberOfQubits, numberOfQubits, true);
 
-            //Debug.Log("Width: " + width + " height: " + height + " dimX: " + dimX  + " dimY: " + dimY + " maxheight: " + maxHeight);
-
             int index;
             int posX;
 
-            for (int i = 0; i < width; i++)
-            {
+            for (int i = 0; i < width; i++) {
                 posX = linesWidth[i] * maxHeight;
-                for (int j = 0; j < height; j++)
-                {
+                for (int j = 0; j < height; j++) {
                     index = posX + linesHeight[j];
                     circuit.Amplitudes[index].Real = heights2D[i, j];
                 }
@@ -1102,8 +959,7 @@ namespace QuantumImage
         }
 
 
-        public static double[] CircuitToHeight(QuantumCircuit circuit, bool undoNormalization = false)
-        {
+        public static double[] CircuitToHeight(QuantumCircuit circuit, bool undoNormalization = false) {
             double[] height = new double[circuit.AmplitudeLength];
 
             int[] lines = MakeLinesInt(circuit.NumberOfQubits);
@@ -1115,18 +971,13 @@ namespace QuantumImage
 
             int length = height.Length;
 
-            if (undoNormalization && circuit.OriginalSum > 0)
-            {
-                for (int i = 0; i < length; i++)
-                {
+            if (undoNormalization && circuit.OriginalSum > 0) {
+                for (int i = 0; i < length; i++) {
                     height[i] = probs[lines[i]] * circuit.OriginalSum;
                 }
-            }
-            else
-            {
+            } else {
 
-                for (int i = 0; i < length; i++)
-                {
+                for (int i = 0; i < length; i++) {
                     height[i] = probs[lines[i]];
                 }
             }
@@ -1134,8 +985,7 @@ namespace QuantumImage
             return height;
         }
 
-        public static double[,] CircuitToHeight2D(QuantumCircuit circuit, int width, int height, bool renormalize = false)
-        {
+        public static double[,] CircuitToHeight2D(QuantumCircuit circuit, int width, int height, bool renormalize = false) {
             double[,] heights2D = new double[width, height];
 
             int widthLog = Mathf.CeilToInt(Mathf.Log(width) / Mathf.Log(2));
@@ -1144,8 +994,7 @@ namespace QuantumImage
             int[] widthLines = MakeLinesInt(widthLog);
             int[] heightLines = widthLines;
 
-            if (height != width)
-            {
+            if (height != width) {
                 heightLog = Mathf.CeilToInt(Mathf.Log(height) / Mathf.Log(2));
                 heightLines = MakeLinesInt(heightLog);
             }
@@ -1159,21 +1008,15 @@ namespace QuantumImage
 
             double normalization = 0;
 
-            if (!renormalize && circuit.OriginalSum > 0)
-            {
+            if (!renormalize && circuit.OriginalSum > 0) {
 
                 normalization = circuit.OriginalSum;
 
-            }
-            else
-            {
-                for (int i = 0; i < width; i++)
-                {
-                    for (int j = 0; j < height; j++)
-                    {
+            } else {
+                for (int i = 0; i < width; i++) {
+                    for (int j = 0; j < height; j++) {
                         int pos = widthLines[i] * height + heightLines[j];
-                        if (probs[pos] > normalization)
-                        {
+                        if (probs[pos] > normalization) {
                             normalization = probs[pos];
                         }
                     }
@@ -1183,11 +1026,9 @@ namespace QuantumImage
 
             int posX = 0;
 
-            for (int i = 0; i < width; i++)
-            {
+            for (int i = 0; i < width; i++) {
                 posX = widthLines[i] * height;
-                for (int j = 0; j < height; j++)
-                {
+                for (int j = 0; j < height; j++) {
                     heights2D[i, j] = probs[posX + heightLines[j]] * normalization;
                 }
             }

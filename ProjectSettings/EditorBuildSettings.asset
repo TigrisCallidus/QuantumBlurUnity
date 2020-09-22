@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Examples/BlurScene.unity
+    guid: ee366953fed70cc469a520d49326c9f2
   m_configObjects: {}

@@ -12,10 +12,8 @@
 // copyright notice, and modified files need to carry a notice indicating
 // that they have been altered from the originals.using System;
 
-namespace Qiskit
-{
-    public enum CircuitType
-    {
+namespace Qiskit {
+    public enum CircuitType {
         X,
         RX,
         H,
@@ -26,15 +24,13 @@ namespace Qiskit
 
     [System.Serializable]
     //DO NOT MAKE THIS A CLASS (used for copying! (explizit values vs reference))
-    public struct ComplexNumber
-    {
+    public struct ComplexNumber {
         public double Real;
         public double Complex;
     }
 
     [System.Serializable]
-    public class Gate
-    {
+    public class Gate {
         public CircuitType CircuitType;
 
         public int First = 0;
