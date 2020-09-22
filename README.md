@@ -26,9 +26,9 @@ Alternatively clone this repository and open it as new project in unity.
 ## Usage
 
 There are 2 ways in which you can use QuantumBlurUnity:
-You can either use it as is with the included 2 effects quantum blur and teleportation to manipulate images
-alernatively you can use the provided functionality to transform images to quantum circuits and manipulate them before transforming
-them back to images yourself to create new effects.
+You can either use it as is with the included 2 effects quantum blur and teleportation to manipulate images. For this use the BlurScene.
+Alernatively you can use the provided functionality to transform images to quantum circuits and manipulate them before transforming
+them back to images yourself to create new effects examples for this can be found in the BlurExamples scene.
 
 ### Direct usage
 
@@ -113,7 +113,7 @@ It works for standalone builds. Other build smay work as well, but are not teste
 
 
 ### Creating new image effects
-1.  Open the scene "BlurScene" in the folder Examples 
+1.  Open the scene "BlurExamples" in the folder Examples 
 2.  Select the object "Create own effects" in the Hierarchy window.
 3.  In the Inspector window you can see the script "Quantum Blur Usage"
 4.  Open this script (double click on "QuantumBlurUSage" next to "Script")
@@ -121,3 +121,7 @@ It works for standalone builds. Other build smay work as well, but are not teste
 6.  Add some circuit manipulation to "CalculateMyOwnEffect"
 7.  In the Inspector load an image to the Input Texture and press "Apply your own image effect" to test it.
 8.  Take these small examples as inspiration to do write your own functions!
+
+There is also an advanced example included which manipulates meshes. The "animation" only works, when the in play mode in unity,
+the simple mesh blur can also be used in the editor.
+This example shows how one can transform non-image data (in this example a mesh) into a quantum circuit manipulate the circuit and transforms the data back.
