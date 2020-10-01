@@ -11,26 +11,27 @@ and translate the circuit back to an image to have a modified image.
 
 The way the gates work on the quantum circuit is the same as in [MicroQiskit](https://github.com/qiskit-community/MicroQiskit).
 
-## Requirements
+# Requirements
 
 QuantumBlurUnity needs a not too old version of [Unity](https://unity3d.com/de/get-unity/download) in order to use it.
 It was written using Unity 2019.4, however, it should also be compatible to previous versions, since only basic Unity functionality is used.
 This package uses [Unity Python](https://github.com/exodrifter/unity-python) which itself works for Unity 2019.3 or later. This package is included in the project and does not need to be downloaded separately.
 
-## Installation
+# Installation
 
 Just download the unity package "QuantumBlur.unitypackage" from the main folder and import it into a Unity project.
 Either right click in your unity "Import Package -> Custom Package" or just by opening the file while you have the desired Unity project open.
 Alternatively clone this repository and open it as new project in unity. 
 
-## Usage
+# Usage
 
-There are 2 ways in which you can use QuantumBlurUnity:
+There are now 3 ways in which you can use QuantumBlurUnity:
 You can either use it as is with the included 2 effects quantum blur and teleportation to manipulate images. For this use the BlurScene.
 Alernatively you can use the provided functionality to transform images to quantum circuits and manipulate them before transforming
 them back to images yourself to create new effects examples for this can be found in the BlurExamples scene.
+Or you can use the newly included terrain generation example, to produce 3D terrains out of blured pictures (or even use your own effects).
 
-### Direct usage
+## I. Direct usage
 
 This package provides two different implemented algorithms as is:
 
@@ -42,9 +43,9 @@ This package provides two different implemented algorithms as is:
 Additional functionality to load and save images is included.
 
 
-#### In the Unity editor
+### In the Unity editor
 
-##### Preparing the images
+#### Preparing the images
 
 0. It is best to use square images with width and length equal to a power of 2 (32, 64, 128, 256, 512, 1024, 2048, 4096 etc.)
 1. To manipulate images drag and drop them into your Project (importing them into unity).
@@ -55,7 +56,7 @@ Additional functionality to load and save images is included.
 
 Now your images are in your project and readable to scripts.
 
-##### Manipulating images
+#### Manipulating images
 
 This supports all kind of image formats Unity can read, however, 
 saved images will always be pngs.
@@ -83,7 +84,7 @@ saved images will always be pngs.
     - Press "Save Output Texture to specific file directly"
 12. Your files will be saved as png images.
 
-#### During play
+### During play
 
 This only supports png images at the moment.
 
@@ -97,7 +98,7 @@ This only supports png images at the moment.
 8.  Press "Save" to save the images to the disk.
 
 
-#### Making a build
+### Making a build
 
 This also only supports png images at the moment.
 It works for standalone builds. Other build smay work as well, but are not tested.
@@ -112,7 +113,7 @@ It works for standalone builds. Other build smay work as well, but are not teste
 8.  Use build in the same way as the play mode (above)
 
 
-### Creating new image effects
+## II. Creating new image effects
 1.  Open the scene "BlurExamples" in the folder Examples 
 2.  Select the object "Create own effects" in the Hierarchy window.
 3.  In the Inspector window you can see the script "Quantum Blur Usage"
@@ -121,7 +122,25 @@ It works for standalone builds. Other build smay work as well, but are not teste
 6.  Add some circuit manipulation to "CalculateMyOwnEffect"
 7.  In the Inspector load an image to the Input Texture and press "Apply your own image effect" to test it.
 8.  Take these small examples as inspiration to do write your own functions!
+9.  Apart from the image examples, there is now an example which manipulates a mesh.
+10. You can press "Save Image" and "Save Mesh" to save the generated results. Just specify "Image/Mesh File Name" (and an existing folder).
 
-There is also an advanced example included which manipulates meshes. The "animation" only works, when the in play mode in unity,
-the simple mesh blur can also be used in the editor.
+The example using meshes is more advanced, however, the methods used can be used for your custom data as well. 
+The "animation" only works, when the in play mode in unity, the simple mesh blur can also be used in the editor.
 This example shows how one can transform non-image data (in this example a mesh) into a quantum circuit manipulate the circuit and transforms the data back.
+
+## III. Creating 3D terrain out of blurred images.
+
+1.  Open the scene "TerrainGeneratorExample" in the folder Examples/TerrainGeneration
+2.  Select the object "TerrainGenerator" in the Hierarchy window.
+3.  In the inspector you can see the script "Terrain Generator".
+4.  Select the image you want to manipulate as "Texture To Blur". It should be prepared as mentioned above. 
+    - Either drag and drop it from your Project window 
+    - or click the circle on the right to select it
+5.  Press "Apply Blur effect to...." to apply the blur effect to the texture which creates "Input Texture"
+    - Alternatively you can also press "Apply your own effect..." to apply your own effect (from the quantum usage example) to the image.
+    - Alternatively you can drag an image directly into "Input Texture". If you have already saved nice (blurred) images.
+6.  Press "Generate a terrain...." to generate a terrain using the method selected under "Visualisation Method"
+7.  You can change the color parameters and then press "Color the terrain..." to change only the color.
+8.  Experiment with different parameters. You can save them to files or load them from files using different profiles.
+9. If you like the mesh, press "Save the terrain..." to save a copy (named after "File Name" in the folder Examples/TerrainGeneration/GeneratedMeshes
