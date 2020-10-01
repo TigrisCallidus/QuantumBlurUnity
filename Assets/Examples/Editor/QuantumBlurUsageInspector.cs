@@ -43,11 +43,11 @@ public class QuantumBlurUsageInspector : Editor {
         }
 
         if (GUILayout.Button("Apply Unity Blur")) {
-            targetTest.OutputTexture = targetTest.CalculateUnityBlur(targetTest.InputTexture, targetTest.Rotation);
+            targetTest.OutputTexture = QuantumBlurUsage.CalculateUnityBlur(targetTest.InputTexture, targetTest.Rotation);
         }
 
         if (GUILayout.Button("Apply your own image effect")) {
-            targetTest.OutputTexture = targetTest.CalculateMyOwnEffect(targetTest.InputTexture);
+            targetTest.OutputTexture = QuantumBlurUsage.CalculateMyOwnEffect(targetTest.InputTexture);
         }
 
         if (GUILayout.Button("Blur Mesh effect")) {
@@ -56,6 +56,16 @@ public class QuantumBlurUsageInspector : Editor {
 
         if (GUILayout.Button("Do Mesh Animation")) {
             targetTest.DoMeshAnimation();
+        }
+
+        if (GUILayout.Button("Save Image")) {
+            targetTest.SaveImageFile();
+            AssetDatabase.Refresh();
+        }
+
+        if (GUILayout.Button("Save Mesh")) {
+            AssetDatabase.CreateAsset(targetTest.OutputMesh, targetTest.GenerateMeshSavePath());
+            AssetDatabase.SaveAssets();
         }
 
     }

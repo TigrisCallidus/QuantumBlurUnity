@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5d6529f82ead3b40b27b8575a557517, type: 3}
+  m_Name: BaseSetting
+  m_EditorClassIdentifier: 
+  MaxHeight: 10
+  Invert: 0
+  Threshold: 0.5
+  HeighGradient:
+    serializedVersion: 2
+    key0: {r: 0, g: 0, b: 1, a: 1}
+    key1: {r: 0.6273585, g: 0.6273585, b: 1, a: 1}
+    key2: {r: 1, g: 0.827451, b: 0, a: 0}
+    key3: {r: 1, g: 0.84735405, b: 0.1153474, a: 0}
+    key4: {r: 0.55386966, g: 1, b: 0.13333333, a: 0}
+    key5: {r: 0, g: 0.6226415, b: 0, a: 0}
+    key6: {r: 0.5471698, g: 0.5471698, b: 0.5471698, a: 0}
+    key7: {r: 1, g: 1, b: 1, a: 0}
+    ctime0: 0
+    ctime1: 6554
+    ctime2: 9830
+    ctime3: 16056
+    ctime4: 16384
+    ctime5: 32768
+    ctime6: 49151
+    ctime7: 65535
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 8
+    m_NumAlphaKeys: 2
+  AlwaysDrawBottomCube: 1
+  ColorTranslation: 0
+  ColorScaling: 1
+  VisualisationMethod: 1
