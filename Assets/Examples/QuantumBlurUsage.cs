@@ -54,7 +54,7 @@ public class QuantumBlurUsage : MonoBehaviour {
     public bool reverseAnimation = false;
 
     [Tooltip("The folderName to which you want to save the generated files")]
-    public string FolderName = "Visualisation";
+    public string FolderName = "Examples/Visualisation";
     [Tooltip("The name the image should be saved as")]
     public string ImageFileName = "imageTest";
     [Tooltip("The name the image should be saved as")]

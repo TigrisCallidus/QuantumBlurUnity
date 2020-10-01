@@ -65,7 +65,7 @@ public class TerrainGenerator : MonoBehaviour {
     public Data3D Data3D;
 
     //Path to the generatedMeshes folder change if you move this plugin around
-    const string path = "Assets/TerrainGeneration/GeneratedMeshes/";
+    const string path = "Assets/Examples/TerrainGeneration/GeneratedMeshes/";
 
 
     /// <summary>

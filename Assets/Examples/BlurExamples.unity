@@ -402,7 +402,7 @@ MonoBehaviour:
   EndRotation: 0.3
   Duration: 3
   reverseAnimation: 1
-  FolderName: Visualisation
+  FolderName: Examples/Visualisation
   ImageFileName: imageTest
   MeshFileName: meshTest
 --- !u!4 &1393298162
