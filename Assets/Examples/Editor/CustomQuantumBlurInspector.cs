@@ -20,10 +20,10 @@ using UnityEditor;
 //Custom Editor for the QuantumBlurUnity class, adding some buttons and a representation of the Maze
 public class CustomQuantumBlurInspector : Editor {
 
-    QuantumBlurUnity targetTest;
+    QuantumBlurUnity targetScript;
 
     void OnEnable() {
-        targetTest = target as QuantumBlurUnity;
+        targetScript = target as QuantumBlurUnity;
     }
 
     public override void OnInspectorGUI() {
@@ -35,31 +35,39 @@ public class CustomQuantumBlurInspector : Editor {
 
 
         if (GUILayout.Button("Create blurred image using quantum blur")) {
-            targetTest.CreateBlur();
+            if (targetScript.OutputTexture != null && !AssetDatabase.Contains(targetScript.OutputTexture)) {
+                Texture2D.DestroyImmediate(targetScript.OutputTexture);
+                Resources.UnloadUnusedAssets();
+            }
+            targetScript.CreateBlur();
         }
 
         if (GUILayout.Button("Mix the 2 images using teleportation")) {
-            targetTest.Teleport();
+            if (targetScript.OutputTexture != null && !AssetDatabase.Contains(targetScript.OutputTexture)) {
+                Texture2D.DestroyImmediate(targetScript.OutputTexture);
+                Resources.UnloadUnusedAssets();
+            }
+            targetScript.Teleport();
         }
 
         if (GUILayout.Button("Load File as InputTexture")) {
-            targetTest.LoadPNG();
+            targetScript.LoadPNG();
         }
 
 
         if (GUILayout.Button("Load File as InputTexture2")) {
-            targetTest.LoadPNG2();
+            targetScript.LoadPNG2();
         }
 
         if (GUILayout.Button("Save Output Texture to specific file directly")) {
-            targetTest.SaveFileDirect();
+            targetScript.SaveFileDirect();
             AssetDatabase.Refresh();
 
         }
 
 
         if (GUILayout.Button("Save Output Texture to file using file browser")) {
-            targetTest.SaveFile();
+            targetScript.SaveFile();
         }
 
     }

@@ -33,27 +33,32 @@ public class TerrainGeneratorEditor : Editor {
         // Spawn buttons
 
         if (GUILayout.Button("Apply Blur effect to the Texture to Blur")) {
+            if (targetScript.InputTexture!=null && !AssetDatabase.Contains(targetScript.InputTexture)) {
+                Texture2D.DestroyImmediate(targetScript.InputTexture);
+                Resources.UnloadUnusedAssets();
+            }
             targetScript.ApplyBlur();
         }
         
         if (GUILayout.Button("Apply your own effect to the Texture to Blur")) {
+            if (targetScript.InputTexture != null && !AssetDatabase.Contains(targetScript.InputTexture)) {
+                Texture2D.DestroyImmediate(targetScript.InputTexture);
+                Resources.UnloadUnusedAssets();
+            }
             targetScript.ApplyYourOwnEffect();
         }
 
-        /*
-
-        if (GUILayout.Button("Generate 2D Data")) {
-            targetScript.Generate2DData();
-        }
-
-        if (GUILayout.Button("Generate 3D Data")) {
-            targetScript.Generate3DDataFrom2DData();
-        }
-
-        */
-
         if (GUILayout.Button("Generate a terrain with the chosen visualisation method")) {
+            if (targetScript.GeneratedMesh != null && !AssetDatabase.Contains(targetScript.GeneratedMesh)) {
+                Mesh.DestroyImmediate(targetScript.GeneratedMesh);
+                Resources.UnloadUnusedAssets();
+            }
             targetScript.GenerateMesh();
+        }
+
+        if (GUILayout.Button("Recalculate image data for new settings.")) {
+            targetScript.Generate2DData();
+            targetScript.Generate3DDataFrom2DData();
         }
 
         if (GUILayout.Button("Color the terrain with the current settings")) {

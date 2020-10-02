@@ -20,10 +20,10 @@ using UnityEditor;
 //Custom Editor for the QuantumBlurUnity class, adding some buttons and a representation of the Maze
 public class QuantumBlurUsageInspector : Editor {
 
-    QuantumBlurUsage targetTest;
+    QuantumBlurUsage targetScript;
 
     void OnEnable() {
-        targetTest = target as QuantumBlurUsage;
+        targetScript = target as QuantumBlurUsage;
     }
 
     public override void OnInspectorGUI() {
@@ -35,36 +35,60 @@ public class QuantumBlurUsageInspector : Editor {
 
 
         if (GUILayout.Button("Apply Simple Blur")) {
-            targetTest.OutputTexture = targetTest.CalculateSimpleBlur(targetTest.InputTexture, targetTest.Rotation, targetTest.LogarithmicEncoding);
+            if (targetScript.OutputTexture != null && !AssetDatabase.Contains(targetScript.OutputTexture)) {
+                Texture2D.DestroyImmediate(targetScript.OutputTexture);
+                Resources.UnloadUnusedAssets();
+            }
+            targetScript.OutputTexture = targetScript.CalculateSimpleBlur(targetScript.InputTexture, targetScript.Rotation, targetScript.LogarithmicEncoding);
         }
 
         if (GUILayout.Button("Apply Simple Half Blur")) {
-            targetTest.OutputTexture = targetTest.CalculateSimpleHalfBlur(targetTest.InputTexture, targetTest.Rotation, targetTest.LogarithmicEncoding);
+            if (targetScript.OutputTexture != null && !AssetDatabase.Contains(targetScript.OutputTexture)) {
+                Texture2D.DestroyImmediate(targetScript.OutputTexture);
+                Resources.UnloadUnusedAssets();
+            }
+            targetScript.OutputTexture = targetScript.CalculateSimpleHalfBlur(targetScript.InputTexture, targetScript.Rotation, targetScript.LogarithmicEncoding);
         }
 
         if (GUILayout.Button("Apply Unity Blur")) {
-            targetTest.OutputTexture = QuantumBlurUsage.CalculateUnityBlur(targetTest.InputTexture, targetTest.Rotation);
+            if (targetScript.OutputTexture != null && !AssetDatabase.Contains(targetScript.OutputTexture)) {
+                Texture2D.DestroyImmediate(targetScript.OutputTexture);
+                Resources.UnloadUnusedAssets();
+            }
+            targetScript.OutputTexture = QuantumBlurUsage.CalculateUnityBlur(targetScript.InputTexture, targetScript.Rotation);
         }
 
         if (GUILayout.Button("Apply your own image effect")) {
-            targetTest.OutputTexture = QuantumBlurUsage.CalculateMyOwnEffect(targetTest.InputTexture);
+            if (targetScript.OutputTexture != null && !AssetDatabase.Contains(targetScript.OutputTexture)) {
+                Texture2D.DestroyImmediate(targetScript.OutputTexture);
+                Resources.UnloadUnusedAssets();
+            }
+            targetScript.OutputTexture = QuantumBlurUsage.CalculateMyOwnEffect(targetScript.InputTexture);
         }
 
         if (GUILayout.Button("Blur Mesh effect")) {
-            targetTest.TransformMesh();
+            if (targetScript.OutputMesh != null && !AssetDatabase.Contains(targetScript.OutputMesh)) {
+                Mesh.DestroyImmediate(targetScript.OutputMesh);
+                Resources.UnloadUnusedAssets();
+            }
+            targetScript.TransformMesh();
         }
 
         if (GUILayout.Button("Do Mesh Animation")) {
-            targetTest.DoMeshAnimation();
+            if (targetScript.OutputMesh != null && !AssetDatabase.Contains(targetScript.OutputMesh)) {
+                Mesh.DestroyImmediate(targetScript.OutputMesh);
+                Resources.UnloadUnusedAssets();
+            }
+            targetScript.DoMeshAnimation();
         }
 
         if (GUILayout.Button("Save Image")) {
-            targetTest.SaveImageFile();
+            targetScript.SaveImageFile();
             AssetDatabase.Refresh();
         }
 
         if (GUILayout.Button("Save Mesh")) {
-            AssetDatabase.CreateAsset(targetTest.OutputMesh, targetTest.GenerateMeshSavePath());
+            AssetDatabase.CreateAsset(targetScript.OutputMesh, targetScript.GenerateMeshSavePath());
             AssetDatabase.SaveAssets();
         }
 

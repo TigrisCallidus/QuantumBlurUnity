@@ -79,6 +79,12 @@ public class TerrainGenerator : MonoBehaviour {
             return;
         }
 
+        if (!TextureToBlur.isReadable) {
+            Debug.LogError("TextureToBlur is not readable. Select the image and in the Inspector window go to 'Advanced' and set 'Read / Write Enabled' to true (tick the box)");
+        }
+
+
+
         InputTexture = QuantumBlurUsage.CalculateUnityBlur(TextureToBlur, BlurRotation);
         if (clearData) {
             //Clearing data
@@ -95,6 +101,10 @@ public class TerrainGenerator : MonoBehaviour {
         if (TextureToBlur == null) {
             Debug.LogError("No texture to blur specified!");
             return;
+        }
+
+        if (!TextureToBlur.isReadable) {
+            Debug.LogError("TextureToBlur is not readable. Select the image and in the Inspector window go to 'Advanced' and set 'Read / Write Enabled' to true (tick the box)");
         }
 
         InputTexture = QuantumBlurUsage.CalculateMyOwnEffect(TextureToBlur, BlurRotation);
@@ -116,6 +126,10 @@ public class TerrainGenerator : MonoBehaviour {
             if (InputTexture == null) {
                 return;
             }
+        }
+
+        if (!InputTexture.isReadable) {
+            Debug.LogError("InputTexture is not readable. Select the image and in the Inspector window go to 'Advanced' and set 'Read / Write Enabled' to true (tick the box)");
         }
 
         int width = InputTexture.width;
