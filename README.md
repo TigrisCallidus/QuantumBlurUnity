@@ -20,7 +20,7 @@ This package uses [Unity Python](https://github.com/exodrifter/unity-python) whi
 # Installation
 
 Just download the unity package "QuantumBlur.unitypackage" from the main folder and import it into a Unity project.
-Either right click in your unity "Import Package -> Custom Package" or just by opening the file while you have the desired Unity project open.
+You can do so within Unity by going to the "Assets" menu, or by right-clicking in your Assets folder, and choosing "Import Package -> Custom Package". You can also simply opening the file while you have the desired Unity project open.
 Alternatively clone this repository and open it as new project in unity. 
 
 # Usage
@@ -29,7 +29,7 @@ There are now 3 ways in which you can use QuantumBlurUnity:
 You can either use it as is with the included 2 effects quantum blur and teleportation to manipulate images. For this use the BlurScene.
 Alernatively you can use the provided functionality to transform images to quantum circuits and manipulate them before transforming
 them back to images yourself to create new effects examples for this can be found in the BlurExamples scene.
-Or you can use the newly included terrain generation example, to produce 3D terrains out of blured pictures (or even use your own effects).
+Or you can use the newly included terrain generation example, to produce 3D terrains out of blurred pictures (or even use your own effects).
 
 ## I. Direct usage
 
