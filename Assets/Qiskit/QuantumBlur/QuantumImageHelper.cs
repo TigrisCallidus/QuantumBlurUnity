@@ -13,6 +13,7 @@
 // that they have been altered from the originals.
 
 using Qiskit;
+using Qiskit.Float;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -631,6 +632,88 @@ namespace QuantumImage {
             return texture;
         }
 
+        public static Texture2D CalculateColorTexture(QuantumCircuitFloat redCircuit, QuantumCircuitFloat greenCircuit, QuantumCircuitFloat blueCircuit, int width, int height, bool renormalize = false) {
+
+            Texture2D texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+
+            int widthLog = Mathf.CeilToInt(Mathf.Log(width) / Mathf.Log(2));
+            int heightLog = widthLog;
+
+            int[] widthLines = MakeLinesInt(widthLog);
+            int[] heightLines = widthLines;
+
+            if (height != width) {
+                heightLog = Mathf.CeilToInt(Mathf.Log(height) / Mathf.Log(2));
+                heightLines = MakeLinesInt(heightLog);
+            }
+
+            MicroQiskitSimulatorFloat simulator = new MicroQiskitSimulatorFloat();
+
+            float[] redProbs = simulator.GetProbabilities(redCircuit);
+            float[] greenProbs = simulator.GetProbabilities(greenCircuit);
+            float[] blueProbs = simulator.GetProbabilities(blueCircuit);
+
+
+            float normalizationRed = 0;
+            float normalizationGreen = 0;
+            float normalizationBlue = 0;
+
+            if (!renormalize && redCircuit.OriginalSum > 0 && greenCircuit.OriginalSum > 0 && blueCircuit.OriginalSum > 0) {
+                normalizationRed = redCircuit.OriginalSum;
+                normalizationGreen = greenCircuit.OriginalSum;
+                normalizationBlue = blueCircuit.OriginalSum;
+            } else {
+                for (int i = 0; i < width; i++) {
+                    for (int j = 0; j < height; j++) {
+                        int pos = widthLines[i] * height + heightLines[j];
+                        if (redProbs[pos] > normalizationRed) {
+                            normalizationRed = redProbs[pos];
+                        }
+                        if (greenProbs[pos] > normalizationGreen) {
+                            normalizationGreen = greenProbs[pos];
+                        }
+                        if (blueProbs[pos] > normalizationBlue) {
+                            normalizationBlue = blueProbs[pos];
+                        }
+                    }
+                }
+                normalizationRed = 1.0f / normalizationRed;
+                normalizationGreen = 1.0f / normalizationGreen;
+                normalizationBlue = 1.0f / normalizationBlue;
+            }
+
+            Unity.Collections.NativeArray<Color32> data = texture.GetRawTextureData<Color32>();
+
+            //TODO set blocks of color
+            
+
+            float redValue;
+            float greenValue;
+            float blueValue;
+
+            //Color color = new Color();          
+
+            int posX = 0;
+
+            for (int x = 0; x < width; x++) {
+                posX = widthLines[x] * height;
+                for (int y = 0; y < height; y++) {
+                    int index = posX + heightLines[y];
+                    redValue = (redProbs[index] * normalizationRed);
+                    greenValue = (greenProbs[index] * normalizationGreen);
+                    blueValue = (blueProbs[index] * normalizationBlue);
+                    //color.r = redValue;
+                    //color.g = greenValue;
+                    //color.b = blueValue;
+                    texture.SetPixel(x, y, new Color(redValue, greenValue, blueValue));
+                }
+            }
+            
+
+            texture.Apply();
+            return texture;
+        }
+
 
         public static void GetProbabilityArrays(double[] totalProbabilities, int numberOfQubits, ref double[] usedProbabilities, ref string[] usedNames) {
             List<double> usedProbabilityList = new List<double>();
@@ -909,6 +992,54 @@ namespace QuantumImage {
                     redCircuit.Amplitudes[index].Real = Math.Sqrt(color.r);
                     greenCircuit.Amplitudes[index].Real = Math.Sqrt(color.g);
                     blueCircuit.Amplitudes[index].Real = Math.Sqrt(color.b);
+                }
+            }
+
+            redCircuit.Normalize();
+            greenCircuit.Normalize();
+            blueCircuit.Normalize();
+
+        }
+
+
+        public static void TextureToColorCircuit(Texture2D inputTexture, out QuantumCircuitFloat redCircuit, out QuantumCircuitFloat greenCircuit, out QuantumCircuitFloat blueCircuit, bool useLog = false) {
+            int width = inputTexture.width;
+            int height = inputTexture.height;
+
+
+            int dimX = Mathf.CeilToInt(Mathf.Log(width) / Mathf.Log(2));
+            int[] linesWidth = MakeLinesInt(dimX);
+
+            int dimY = dimX;
+            int[] linesHeight = linesWidth;
+
+            if (width != height) {
+                dimY = Mathf.CeilToInt(Mathf.Log(height) / Mathf.Log(2));
+                linesHeight = MakeLinesInt(dimY);
+
+            }
+
+            int maxHeight = MathHelper.IntegerPower(2, dimY);
+            int numberOfQubits = dimX + dimY;
+
+            redCircuit = new QuantumCircuitFloat(numberOfQubits, numberOfQubits, true);
+            greenCircuit = new QuantumCircuitFloat(numberOfQubits, numberOfQubits, true);
+            blueCircuit = new QuantumCircuitFloat(numberOfQubits, numberOfQubits, true);
+
+
+            Color color;
+            int index;
+            int posX;
+
+            for (int x = 0; x < width; x++) {
+                posX = linesWidth[x] * maxHeight;
+                for (int y = 0; y < height; y++) {
+                    index = posX + linesHeight[y];
+                    color = inputTexture.GetPixel(x, y);
+
+                    redCircuit.Amplitudes[index].Real = Mathf.Sqrt(color.r);
+                    greenCircuit.Amplitudes[index].Real = Mathf.Sqrt(color.g);
+                    blueCircuit.Amplitudes[index].Real = Mathf.Sqrt(color.b);
                 }
             }
 

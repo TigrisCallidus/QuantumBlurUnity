@@ -173,7 +173,7 @@ public class QuantumBlurUsage : MonoBehaviour {
         ApplyPartialQ(blue, rotation);
 
         //Generating the texture after the quantum circuits were modified.
-        outputTexture = QuantumImageCreator.GetColoreTextureDirect(red, green, blue, inputTexture.width, inputTexture.height);
+        outputTexture = QuantumImageCreator.GetColoreTextureDirectFast(red, green, blue, inputTexture.width, inputTexture.height);
 
         return outputTexture;
     }

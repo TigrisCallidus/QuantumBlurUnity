@@ -11,7 +11,7 @@
 //
 // Any modifications or derivative works of this code must retain this
 // copyright notice, and modified files need to carry a notice indicating
-// that they have been altered from the originals.using System;
+// that they have been altered from the originals.
 
 using System;
 
@@ -131,14 +131,17 @@ namespace Qiskit {
             int opposingPow = MathHelper.IntegerPower(2, numberOfQubits - first - 1);
 
             for (int i = 0; i < firstPow; i++) {
+                int posj = 0;
                 for (int j = 0; j < opposingPow; j++) {
-                    int pos1 = i + firstPlusPow * j;
+                    //int pos1 = i + firstPlusPow * j;
+                    int pos1 = i + posj;
                     int pos2 = pos1 + firstPow;
 
                     ComplexNumber old = amplitudes[pos1];
                     amplitudes[pos1] = amplitudes[pos2];
                     amplitudes[pos2] = old;
 
+                    posj += firstPlusPow;
                 }
             }
         }
@@ -149,13 +152,15 @@ namespace Qiskit {
             int firstPlusPow = MathHelper.IntegerPower(2, first + 1);
             int opposingPow = MathHelper.IntegerPower(2, numberOfQubits - first - 1);
 
-            double theta = gate.Theta;
-            double cosTheta = Math.Cos(theta / 2);
-            double sinTheta = Math.Sin(theta / 2);
+            double thetaHalf = gate.Theta/2;
+            double cosTheta = Math.Cos(thetaHalf);
+            double sinTheta = Math.Sin(thetaHalf);
 
             for (int i = 0; i < firstPow; i++) {
+                int posj = 0;
                 for (int j = 0; j < opposingPow; j++) {
-                    int pos1 = i + firstPlusPow * j;
+                    //int pos1 = i + firstPlusPow * j;
+                    int pos1 = i + posj;
                     int pos2 = pos1 + firstPow;
 
                     ComplexNumber p1 = amplitudes[pos1];
@@ -166,6 +171,7 @@ namespace Qiskit {
                     amplitudes[pos2].Real = p2.Real * cosTheta + p1.Complex * sinTheta;
                     amplitudes[pos2].Complex = p2.Complex * cosTheta - p1.Real * sinTheta;
 
+                    posj += firstPlusPow;
                 }
             }
         }
@@ -193,18 +199,26 @@ namespace Qiskit {
             int firstPow = MathHelper.IntegerPower(2, first);
             int secondPow = MathHelper.IntegerPower(2, second);
 
+            int posi = firstPow;
+
             for (int i = 0; i < pow1; i++) {
+                int posj = 0;
                 for (int j = 0; j < pow2; j++) {
+                    int posk = 0;
                     for (int k = 0; k < pow3; k++) {
-                        int pos1 = i + pow1Plus * j + pow2Plus * k + firstPow;
+                        //int pos1 = firstPow + i + pow1Plus * j + pow2Plus * k ;
+                        int pos1 = posi + posj + posk;
                         int pos2 = pos1 + secondPow;
 
                         ComplexNumber old = amplitudes[pos1];
                         amplitudes[pos1] = amplitudes[pos2];
                         amplitudes[pos2] = old;
 
+                        posk += pow2Plus;
                     }
+                    posj += pow1Plus;
                 }
+                posi++;
             }
         }
 
@@ -214,21 +228,22 @@ namespace Qiskit {
             int firstPlusPow = MathHelper.IntegerPower(2, first + 1);
             int opposingPow = MathHelper.IntegerPower(2, numberOfQubits - first - 1);
 
-            double theta = gate.Theta;
-
             for (int i = 0; i < firstPow; i++) {
+                int posj = 0;
                 for (int j = 0; j < opposingPow; j++) {
-                    int pos1 = i + firstPlusPow * j;
+                    //int pos1 = i + firstPlusPow * j;
+                    int pos1 = i + posj;
                     int pos2 = pos1 + firstPow;
 
                     ComplexNumber p1 = amplitudes[pos1];
                     ComplexNumber p2 = amplitudes[pos2];
 
-                    amplitudes[pos1].Real = (p1.Real + p2.Real) * MathHelper.Norm2;
-                    amplitudes[pos1].Complex = (p1.Complex + p2.Complex) * MathHelper.Norm2;
-                    amplitudes[pos2].Real = (p1.Real - p2.Real) * MathHelper.Norm2;
-                    amplitudes[pos2].Complex = (p1.Complex - p2.Complex) * MathHelper.Norm2;
+                    amplitudes[pos1].Real = (p1.Real + p2.Real) * MathHelper.Norm2Float;
+                    amplitudes[pos1].Complex = (p1.Complex + p2.Complex) * MathHelper.Norm2Float;
+                    amplitudes[pos2].Real = (p1.Real - p2.Real) * MathHelper.Norm2Float;
+                    amplitudes[pos2].Complex = (p1.Complex - p2.Complex) * MathHelper.Norm2Float;
 
+                    posj += firstPlusPow;
                 }
             }
         }
@@ -242,9 +257,9 @@ namespace Qiskit {
             int loop1 = first;
             int loop2 = second;
 
-            double theta = gate.Theta;
-            double cosTheta = Math.Cos(theta / 2);
-            double sinTheta = Math.Sin(theta / 2);
+            double thetaHalf = gate.Theta/2;
+            double cosTheta = Math.Cos(thetaHalf);
+            double sinTheta = Math.Sin(thetaHalf);
 
             if (second < first) {
                 loop1 = second;
@@ -262,10 +277,15 @@ namespace Qiskit {
             int firstPow = MathHelper.IntegerPower(2, first);
             int secondPow = MathHelper.IntegerPower(2, second);
 
+            int posi = firstPow;
+
             for (int i = 0; i < pow1; i++) {
+                int posj = 0;
                 for (int j = 0; j < pow2; j++) {
+                    int posk = 0;
                     for (int k = 0; k < pow3; k++) {
-                        int pos1 = i + pow1Plus * j + pow2Plus * k + firstPow;
+                        //int pos1 = i + pow1Plus * j + pow2Plus * k + firstPow;
+                        int pos1 = posi + posj + posk;
                         int pos2 = pos1 + secondPow;
 
                         ComplexNumber p1 = amplitudes[pos1];
@@ -276,9 +296,11 @@ namespace Qiskit {
                         amplitudes[pos2].Real = p2.Real * cosTheta + p1.Complex * sinTheta;
                         amplitudes[pos2].Complex = p2.Complex * cosTheta - p1.Real * sinTheta;
 
-
+                        posk += pow2Plus;
                     }
+                    posj += pow1Plus;
                 }
+                posi++;
             }
         }
 

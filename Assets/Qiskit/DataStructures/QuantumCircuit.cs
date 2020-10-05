@@ -10,7 +10,7 @@
 //
 // Any modifications or derivative works of this code must retain this
 // copyright notice, and modified files need to carry a notice indicating
-// that they have been altered from the originals.using System;
+// that they have been altered from the originals.
 
 using System;
 using System.Collections.Generic;
@@ -19,7 +19,6 @@ using UnityEngine;
 #else
 using System.ComponentModel;
 #endif
-
 
 namespace Qiskit {
 
@@ -30,10 +29,13 @@ namespace Qiskit {
         public int NumberOfOutputs;
         public List<Gate> Gates;
         public ComplexNumber[] Amplitudes;
+        [HideInInspector]
         public int AmplitudeLength;
         //public Vector2Int Dimensions;
+        [HideInInspector]
         public string DimensionString;
-        public double OriginalSum;
+        [HideInInspector]
+        public double OriginalSum=0;
 
         public QuantumCircuit(int numberOfQuibits, int numberOfOutputs, bool initializeAmplitudes = false) {
             Gates = new List<Gate>();
@@ -105,9 +107,6 @@ namespace Qiskit {
             Amplitudes = values;
         }
 
-
-
-
         public void X(int targetQubit) {
             Gate gate = new Gate {
                 CircuitType = CircuitType.X,
@@ -168,7 +167,6 @@ namespace Qiskit {
             Gates.Add(gate);
         }
 
-
         public void RZ(int targetQubit, double rotation) {
             H(targetQubit);
             RX(targetQubit, rotation);
@@ -192,7 +190,6 @@ namespace Qiskit {
             RZ(targetQubit, MathHelper.Pi);
             X(targetQubit);
         }
-
 
         public void ResetGates() {
             Gates.Clear();
@@ -222,8 +219,12 @@ namespace Qiskit {
             }
 
             if (sum < 1 - MathHelper.Eps || sum > 1 + MathHelper.Eps) {
-                OriginalSum = sum;
-
+                //This can happen for really large inputs due to rounding errors.
+                if (OriginalSum == 0) {
+                    OriginalSum = sum;
+                } else {
+                    OriginalSum *= sum;
+                }
                 sum = Math.Sqrt(sum);
 
                 for (int i = 0; i < Amplitudes.Length; i++) {
@@ -233,7 +234,6 @@ namespace Qiskit {
                 }
             }
         }
-
 
         public List<List<double>> GetAmplitudeList() {
             List<List<double>> returnValue = new List<List<double>>();
@@ -248,7 +248,7 @@ namespace Qiskit {
             return returnValue;
         }
 
-        public string GetQiskitString() {
+        public string GetQiskitString(bool includeAllMeasures=false) {
             string translation = "";
 
             if (NumberOfOutputs == 0) {
@@ -281,6 +281,13 @@ namespace Qiskit {
                 }
             }
 
+            if (includeAllMeasures) {
+                string allQubits = "0";
+                for (int i = 1; i < NumberOfQubits && i<NumberOfOutputs; i++) {
+                    allQubits += "," + i;
+                }
+                translation += "qc.measure([" + allQubits + "], [" + allQubits + "])\n";
+            }
             return translation;
         }
 
@@ -299,9 +306,6 @@ namespace Qiskit {
             //TODO different behavious when other is smaller?
             Gates.AddRange(circuit.Gates);
         }
-
-
-
 
         void LogError(string errorMessage) {
 #if Unity_Editor || UNITY_STANDALONE

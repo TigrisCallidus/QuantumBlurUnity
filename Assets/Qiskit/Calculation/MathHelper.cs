@@ -23,6 +23,14 @@ namespace Qiskit {
         public const double Eps = 0.0000001;
 
 
+        public const float PiFloat = 3.1415926535897932384626433832795f;
+        public const float PiHalfFloat = 1.5707963267948966192313216916398f;
+        public const float PiQuarterFloat = 0.78539816339744830961566084581988f;
+        public const float Norm2Float = 0.70710678118654752440084436210485f;
+        //Eps needs to be bigger since there is a bigger error with floats
+        public const float EpsFloat = 0.0001f;
+
+
         /// <summary>
         /// Fast Integer potency. Only works with positive numbers Returns baseValue to the power of powerValue
         /// </summary>
@@ -30,6 +38,9 @@ namespace Qiskit {
         /// <param name="powerValue">The exponent </param>
         /// <returns></returns>
         public static int IntegerPower(int baseValue, int powerValue) {
+            if (powerValue<=0) {
+                return 0;
+            }
             int returnValue = 1;
             while (powerValue != 0) {
                 if ((powerValue & 1) == 1) {
