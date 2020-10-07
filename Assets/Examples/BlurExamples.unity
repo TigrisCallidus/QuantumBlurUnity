@@ -391,9 +391,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3a74dc9c760d9e4db4ef1fb26fac0e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InputTexture: {fileID: 0}
+  InputTexture: {fileID: 2800000, guid: 1654d81fb7c41614dbe1482429949881, type: 3}
   OutputTexture: {fileID: 0}
-  Rotation: 0
+  Rotation: 0.4
   LogarithmicEncoding: 0
   InputMesh: {fileID: 0}
   OutputMesh: {fileID: 0}
@@ -402,7 +402,7 @@ MonoBehaviour:
   EndRotation: 0.3
   Duration: 3
   reverseAnimation: 1
-  FolderName: Examples/Visualisation
+  FolderName: Examples/Visuals
   ImageFileName: imageTest
   MeshFileName: meshTest
 --- !u!4 &1393298162
