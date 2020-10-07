@@ -20,7 +20,7 @@ This package uses [Unity Python](https://github.com/exodrifter/unity-python) whi
 # Installation
 
 Just download the unity package "QuantumBlur.unitypackage" from the main folder and import it into a Unity project.
-You can do so within Unity by going to the "Assets" menu, or by right-clicking in your Assets folder, and choosing "Import Package -> Custom Package". You can also simply opening the file while you have the desired Unity project open.
+You can do so within Unity by going to the "Assets" menu, or by right-clicking in your Assets folder, and choosing "Import Package -> Custom Package". You can also simply open the file, when you have the desired Unity project open.
 Alternatively clone this repository and open it as new project in unity. 
 
 # Usage
@@ -107,10 +107,23 @@ It works for standalone builds. Other build smay work as well, but are not teste
 2.  Press "File" -> "Build Settings..."
 3.  On the new window press "Add Open Scenes"
 4.  If there are other "Scenes In Build" tick them off.
-5.  Press Build
-6.  Wait until the build is finished
-7.  Open the build (Double clicking the exe)
-8.  Use build in the same way as the play mode (above)
+5.  Press "Player Preferences". A new window with "Project Settings" should open.
+6.  Under "Player-> Other Settings" scroll down to "Configuration"
+7.  Set "Api Compatibility" Level to ".Net 4.x"
+8.  If possible set "Scripting Backend" to "IL2CPP"
+    - If IL2CPP is not installed you can try to build without it.
+    - If it does not work you can install it using the "Unity Hub"
+        - Open Unity Hub
+        - Go to Installs
+        - Click on the 3 dots next to the version you are using
+        - Click Add Modules 
+        - Choose the IL2CPP build
+        - Click "Next". Agree the End User License Agreement
+        - Click "Done" and wait until it is installed
+9.  Press Build
+10. Wait until the build is finished
+11. Open the build (Double clicking the exe)
+12. Use build in the same way as the play mode (above)
 
 
 ## II. Creating new image effects
