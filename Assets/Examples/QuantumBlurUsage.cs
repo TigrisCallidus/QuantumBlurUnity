@@ -638,7 +638,7 @@ public class QuantumBlurUsage : MonoBehaviour {
     /// Generates the path for the mesh to be saved. (Since it creates an asset this should be done in an edito script not here directly) 
     /// </summary>
     public string GenerateMeshSavePath() {
-        string path = System.IO.Path.Combine(Application.dataPath, FolderName, ImageFileName + ".Asset");
+        string path = System.IO.Path.Combine("Assets", FolderName, MeshFileName + ".Asset");
         return path;
     }
     #endregion
