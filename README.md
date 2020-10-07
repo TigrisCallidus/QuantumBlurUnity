@@ -20,7 +20,7 @@ This package uses [Unity Python](https://github.com/exodrifter/unity-python) whi
 # Installation
 
 Just download the unity package "QuantumBlur.unitypackage" from the main folder and import it into a Unity project.
-You can do so within Unity by going to the "Assets" menu, or by right-clicking in your Assets folder, and choosing "Import Package -> Custom Package". You can also simply opening the file while you have the desired Unity project open.
+You can do so within Unity by going to the "Assets" menu, or by right-clicking in your Assets folder, and choosing "Import Package -> Custom Package". You can also simply open the file, when you have the desired Unity project open.
 Alternatively clone this repository and open it as new project in unity. 
 
 # Usage
