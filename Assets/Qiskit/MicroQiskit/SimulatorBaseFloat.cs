@@ -40,7 +40,7 @@ namespace Qiskit.Float {
         }
 
 
-        public virtual void SilumateInPlace(QuantumCircuitFloat circuit, ref ComplexNumberFloat[] amplitudes) {
+        public virtual void SimulateInPlace(QuantumCircuitFloat circuit, ref ComplexNumberFloat[] amplitudes) {
             int length = circuit.AmplitudeLength;
             if (amplitudes == null || amplitudes.Length != length) {
                 //Post message

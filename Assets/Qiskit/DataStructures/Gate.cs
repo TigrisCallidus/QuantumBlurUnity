@@ -27,6 +27,14 @@ namespace Qiskit {
     public struct ComplexNumber {
         public double Real;
         public double Complex;
+
+        /// <summary>
+        /// Only packs the real number into a string instead of the real and complex, since this is used for initialisation
+        /// </summary>
+        /// <returns>The real number as string</returns>
+        public override string ToString() {
+            return Real.ToString();
+        }
     }
 
     [System.Serializable]
@@ -39,5 +47,6 @@ namespace Qiskit {
         public double Theta = 0;
     }
 
+  
 
 }

@@ -27,12 +27,15 @@ namespace Qiskit {
         /// <param name="circuit">The quantum circuit which will be simulated</param>
         /// <returns></returns>
         public override ComplexNumber[] Simulate(QuantumCircuit circuit) {
+
+            MathHelper.InitializePower2Values(circuit.NumberOfQubits + 2);
+
+
             ComplexNumber[] amplitudes = base.Simulate(circuit);
 
 
             for (int i = 0; i < circuit.Gates.Count; i++) {
                 Gate gate = circuit.Gates[i];
-
                 switch (gate.CircuitType) {
                     case CircuitType.X:
                         handleX(amplitudes, gate, circuit.NumberOfQubits);
@@ -63,9 +66,10 @@ namespace Qiskit {
         }
 
 
-        public override void SilumateInPlace(QuantumCircuit circuit, ref ComplexNumber[] amplitudes) {
+        public override void SimulateInPlace(QuantumCircuit circuit, ref ComplexNumber[] amplitudes) {
+            MathHelper.InitializePower2Values(circuit.NumberOfQubits + 2);
             //Check Length
-            base.SilumateInPlace(circuit, ref amplitudes);
+            base.SimulateInPlace(circuit, ref amplitudes);
 
             for (int i = 0; i < circuit.Gates.Count; i++) {
                 Gate gate = circuit.Gates[i];
@@ -119,16 +123,20 @@ namespace Qiskit {
         /// <returns></returns>
         public void CalculateProbabilities(QuantumCircuit circuit, ref double[] probabilities, ref ComplexNumber[] amplitudes) {
             //Trying to optimize not needing to return arrays
-            SilumateInPlace(circuit, ref amplitudes);
+            SimulateInPlace(circuit, ref amplitudes);
             base.CalculateProbabilities(amplitudes, ref probabilities);
         }
 
 
         void handleX(ComplexNumber[] amplitudes, Gate gate, int numberOfQubits) {
             int first = gate.First;
-            int firstPow = MathHelper.IntegerPower(2, first);
-            int firstPlusPow = MathHelper.IntegerPower(2, first + 1);
-            int opposingPow = MathHelper.IntegerPower(2, numberOfQubits - first - 1);
+            //int firstPow = MathHelper.IntegerPower(2, first);
+            //int firstPlusPow = MathHelper.IntegerPower(2, first + 1);
+            //int opposingPow = MathHelper.IntegerPower(2, numberOfQubits - first - 1);
+
+            int firstPow = MathHelper.IntegerPower2(first);
+            int firstPlusPow = MathHelper.IntegerPower2(first + 1);
+            int opposingPow = MathHelper.IntegerPower2(numberOfQubits - first - 1);
 
             for (int i = 0; i < firstPow; i++) {
                 int posj = 0;
@@ -148,9 +156,12 @@ namespace Qiskit {
 
         void handleRX(ComplexNumber[] amplitudes, Gate gate, int numberOfQubits) {
             int first = gate.First;
-            int firstPow = MathHelper.IntegerPower(2, first);
-            int firstPlusPow = MathHelper.IntegerPower(2, first + 1);
-            int opposingPow = MathHelper.IntegerPower(2, numberOfQubits - first - 1);
+            //int firstPow = MathHelper.IntegerPower(2, first);
+            //int firstPlusPow = MathHelper.IntegerPower(2, first + 1);
+            //int opposingPow = MathHelper.IntegerPower(2, numberOfQubits - first - 1); 
+            int firstPow = MathHelper.IntegerPower2(first);
+            int firstPlusPow = MathHelper.IntegerPower2(first + 1);
+            int opposingPow = MathHelper.IntegerPower2(numberOfQubits - first - 1);
 
             double thetaHalf = gate.Theta/2;
             double cosTheta = Math.Cos(thetaHalf);
@@ -177,6 +188,47 @@ namespace Qiskit {
         }
 
         void handleCX(ComplexNumber[] amplitudes, Gate gate, int numberOfQubits) {
+            int first = gate.First;
+            int second = gate.Second;
+
+            int pow1, pow2, pow3, pow1Plus, pow2Plus, firstPow, secondPow, end2, end3;
+
+            firstPow = MathHelper.IntegerPower2(first);
+            secondPow = MathHelper.IntegerPower2(second);
+
+            if (second < first) {
+                pow1 = secondPow;
+                pow2Plus = firstPow * 2;
+                pow2 = firstPow;
+            } else {
+                pow1 = firstPow;
+                pow2Plus = secondPow * 2;
+                pow2 = secondPow;
+            }
+
+            pow1Plus = pow1 * 2;
+            pow3 = MathHelper.IntegerPower2(numberOfQubits);
+
+            pow1 += firstPow;
+            for (int posi = firstPow; posi < pow1; posi++) {
+                end2 = pow2 + posi;
+                for (int posj = posi; posj < end2; posj += pow1Plus) {
+                    end3 = pow3 + posj;
+                    for (int posk = posj; posk < end3; posk += pow2Plus) {
+
+                        int pos2 = posk + secondPow;
+                        ComplexNumber old = amplitudes[posk];
+
+                        amplitudes[posk] = amplitudes[pos2];
+                        amplitudes[pos2] = old;
+
+                    }
+                }
+            }
+        }
+
+        //Old less optimized version. Left here for better understanding
+        void handleCXOld(ComplexNumber[] amplitudes, Gate gate, int numberOfQubits) {
             int first = gate.First;
             int second = gate.Second;
 
@@ -224,9 +276,13 @@ namespace Qiskit {
 
         void handleH(ComplexNumber[] amplitudes, Gate gate, int numberOfQubits) {
             int first = gate.First;
-            int firstPow = MathHelper.IntegerPower(2, first);
-            int firstPlusPow = MathHelper.IntegerPower(2, first + 1);
-            int opposingPow = MathHelper.IntegerPower(2, numberOfQubits - first - 1);
+            //int firstPow = MathHelper.IntegerPower(2, first);
+            //int firstPlusPow = MathHelper.IntegerPower(2, first + 1);
+            //int opposingPow = MathHelper.IntegerPower(2, numberOfQubits - first - 1);
+
+            int firstPow = MathHelper.IntegerPower2(first);
+            int firstPlusPow = MathHelper.IntegerPower2(first + 1);
+            int opposingPow = MathHelper.IntegerPower2(numberOfQubits - first - 1);
 
             for (int i = 0; i < firstPow; i++) {
                 int posj = 0;
@@ -244,20 +300,79 @@ namespace Qiskit {
                     amplitudes[pos2].Complex = (p1.Complex - p2.Complex) * MathHelper.Norm2Float;
 
                     posj += firstPlusPow;
+
+
                 }
             }
+
+
         }
 
 
 
         void handleCRX(ComplexNumber[] amplitudes, Gate gate, int numberOfQubits) {
+
             int first = gate.First;
             int second = gate.Second;
 
             int loop1 = first;
             int loop2 = second;
 
-            double thetaHalf = gate.Theta/2;
+            double thetaHalf = gate.Theta / 2;
+            double cosTheta = Math.Cos(thetaHalf);
+            double sinTheta = Math.Sin(thetaHalf);
+
+            int pow1, pow2, pow3, pow1Plus, pow2Plus, firstPow, secondPow, end2, end3;
+
+
+            firstPow = MathHelper.IntegerPower2(first);
+            secondPow = MathHelper.IntegerPower2(second);
+
+            if (second < first) {
+                pow1 = secondPow;
+                pow2Plus = firstPow * 2;
+                pow2 = firstPow;
+            } else {
+                pow1 = firstPow;
+                pow2Plus = secondPow * 2;
+                pow2 = secondPow;
+            }
+
+            pow1Plus = pow1 * 2;
+            pow3 = MathHelper.IntegerPower2(numberOfQubits);
+
+            pow1 += firstPow;
+            for (int posi = firstPow; posi < pow1; posi++) {
+                end2 = pow2 + posi;
+                for (int posj = posi; posj < end2; posj += pow1Plus) {
+                    end3 = pow3 + posj;
+                    for (int posk = posj; posk < end3; posk += pow2Plus) {
+
+                        int pos2 = posk + secondPow;
+
+                        ComplexNumber c1 = amplitudes[posk];
+                        ComplexNumber c2 = amplitudes[pos2];
+
+                        amplitudes[posk].Real = c1.Real * cosTheta + c2.Complex * sinTheta;
+                        amplitudes[posk].Complex = c1.Complex * cosTheta - c2.Real * sinTheta;
+                        amplitudes[pos2].Real = c2.Real * cosTheta + c1.Complex * sinTheta;
+                        amplitudes[pos2].Complex = c2.Complex * cosTheta - c1.Real * sinTheta;
+
+
+                    }
+                }
+            }
+        }
+
+        //Old less optimized version. Left here for better understanding
+        void handleCRXOLD(ComplexNumber[] amplitudes, Gate gate, int numberOfQubits) {
+            int first = gate.First;
+            int second = gate.Second;
+
+            int loop1 = first;
+            int loop2 = second;
+
+            double thetaHalf = gate.Theta / 2;
             double cosTheta = Math.Cos(thetaHalf);
             double sinTheta = Math.Sin(thetaHalf);
 

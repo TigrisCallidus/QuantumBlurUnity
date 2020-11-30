@@ -43,6 +43,7 @@ namespace Qiskit.Float {
             if (initializeAmplitudes) {
                 Amplitudes = new ComplexNumberFloat[AmplitudeLength];
 
+
             }
         }
 
@@ -52,7 +53,7 @@ namespace Qiskit.Float {
             NumberOfOutputs = circuit.NumberOfOutputs;
             AmplitudeLength = circuit.AmplitudeLength;
 
-            Amplitudes = new ComplexNumberFloat[circuit.Amplitudes.Length];
+            Amplitudes = new ComplexNumberFloat[circuit.AmplitudeLength];
 
             for (int i = 0; i < circuit.Amplitudes.Length; i++) {
                 if (circuit.Amplitudes[i].Real > 0) {
@@ -236,7 +237,7 @@ namespace Qiskit.Float {
         public void Normalize(float sum) {
 
             if (sum < MathHelper.EpsFloat) {
-                Debug.LogError("Sum is 0");
+                Debug.LogError("Sum is" + sum);
                 return;
             }
 

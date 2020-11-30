@@ -13,6 +13,7 @@
 // that they have been altered from the originals.using System;
 
 
+
 namespace Qiskit {
     public class SimulatorBase {
         public virtual ComplexNumber[] Simulate(QuantumCircuit circuit) {
@@ -40,7 +41,7 @@ namespace Qiskit {
         }
 
 
-        public virtual void SilumateInPlace(QuantumCircuit circuit, ref ComplexNumber[] amplitudes) {
+        public virtual void SimulateInPlace(QuantumCircuit circuit, ref ComplexNumber[] amplitudes) {
             int length = circuit.AmplitudeLength;
             if (amplitudes == null || amplitudes.Length != length) {
                 //Post message
@@ -62,8 +63,6 @@ namespace Qiskit {
                 //Initialize the all 0 vector
                 amplitudes[0].Real = 1;
             }
-
-
         }
 
 
@@ -77,8 +76,6 @@ namespace Qiskit {
         public virtual double[] GetProbabilities(ComplexNumber[] amplitudes) {
             //Calculating the probability from the amplitudes
             double[] probabilities = new double[amplitudes.Length];
-
-
 
             for (int i = 0; i < probabilities.Length; i++) {
                 probabilities[i] = amplitudes[i].Real * amplitudes[i].Real + amplitudes[i].Complex * amplitudes[i].Complex;
@@ -99,5 +96,6 @@ namespace Qiskit {
             }
 
         }
+
     }
 }

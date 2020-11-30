@@ -38,11 +38,12 @@ namespace Qiskit {
         /// <param name="powerValue">The exponent </param>
         /// <returns></returns>
         public static int IntegerPower(int baseValue, int powerValue) {
-            if (powerValue<=0) {
+
+            if (powerValue<0) {
                 return 0;
             }
             int returnValue = 1;
-            while (powerValue != 0) {
+            while (powerValue > 0) {
                 if ((powerValue & 1) == 1) {
                     returnValue *= baseValue;
                 }
@@ -51,6 +52,45 @@ namespace Qiskit {
             }
             return returnValue;
         }
+
+
+        /// <summary>
+        /// Fast Integer potency. Only works with positive numbers Returns baseValue to the power of powerValue
+        /// </summary>
+        /// <param name="baseValue"> The base </param>
+        /// <param name="powerValue">The exponent </param>
+        /// <returns></returns>
+        public static int IntegerPower2(int powerValue) {
+
+            return Power2Values[powerValue];
+
+            //return IntegerPower(2, powerValue);
+            /*
+
+            if (Power2Values!=null && Power2Values.Length>powerValue && Power2Values[powerValue]>0) {
+                return Power2Values[powerValue];
+            }
+
+            int returnValue = IntegerPower(2, powerValue);
+
+            if (Power2Values != null && Power2Values.Length > powerValue) {
+                Power2Values[powerValue] = returnValue;
+            }
+            return returnValue;
+            */
+        }
+
+        public static void InitializePower2Values(int number = 20) {
+            if (Power2Values!=null && Power2Values.Length>=number) {
+                return;
+            }
+            Power2Values = new int[number];
+            for (int i = 0; i < number; i++) {
+                Power2Values[i] = IntegerPower(2, i);
+            }
+        }
+
+        public static int[] Power2Values;
 
     }
 }

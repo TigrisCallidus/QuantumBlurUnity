@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 #if Unity_Editor || UNITY_STANDALONE
 using UnityEngine;
 #else
@@ -29,13 +30,19 @@ namespace Qiskit {
         public int NumberOfOutputs;
         public List<Gate> Gates;
         public ComplexNumber[] Amplitudes;
+#if Unity_Editor
         [HideInInspector]
+#endif
         public int AmplitudeLength;
         //public Vector2Int Dimensions;
+#if Unity_Editor
         [HideInInspector]
+#endif       
         public string DimensionString;
+#if Unity_Editor
         [HideInInspector]
-        public double OriginalSum=0;
+#endif        
+        public double OriginalSum = 0;
 
         public QuantumCircuit(int numberOfQuibits, int numberOfOutputs, bool initializeAmplitudes = false) {
             Gates = new List<Gate>();
@@ -209,12 +216,13 @@ namespace Qiskit {
 
         public void Normalize() {
             double sum = ProbabilitySum();
+            //Debug.Log(sum);
             Normalize(sum);
         }
 
         public void Normalize(double sum) {
             if (sum < MathHelper.Eps) {
-                LogError("Sum is 0");
+                LogError("Sum is 0 " + sum);
                 return;
             }
 
@@ -248,33 +256,121 @@ namespace Qiskit {
             return returnValue;
         }
 
-        public string GetQiskitString(bool includeAllMeasures=false) {
-            string translation = "";
+        public string GetQiskitString(bool includeAllMeasures = false) {
+
+            //todo use correct number
+            StringBuilder builder = new StringBuilder();
+
+
+            //string translation = "";
+
+            string allnumbers = getAllNumbersString(NumberOfQubits);
 
             if (NumberOfOutputs == 0) {
-                translation += "qc = QuantumCircuit(" + NumberOfQubits + ")\n";
+                //translation += "qc = QuantumCircuit(" + NumberOfQubits + ")\n";
+                builder.Append("qc = QuantumCircuit(");
+                builder.Append(NumberOfQubits);
+                builder.Append(")\n");
+
 
             } else {
-                translation += "qc = QuantumCircuit(" + NumberOfQubits + "," + NumberOfOutputs + ")\n";
+                //translation += "qc = QuantumCircuit(" + NumberOfQubits + "," + NumberOfOutputs + ")\n";
+                builder.Append("qc = QuantumCircuit(");
+                builder.Append(NumberOfQubits);
+                builder.Append(",");
+                builder.Append(NumberOfOutputs);
+                builder.Append(")\n");
+            }
+
+            if (Amplitudes != null && Amplitudes.Length > 0 && OriginalSum > 0) {
+
+                //hack only possible because the Amplitudes.ToString() only gives the Real values.
+                //This makes this quite a bit faster though.
+                string amplitudes = string.Join(",", Amplitudes);
+
+                //string state = "[" + amplitudes + "]";                
+                //translation += "qc.initialize(" + state + ", " + allnumbers + ")\n";
+
+                builder.Append("qc.initialize([");
+                builder.Append(amplitudes);
+                builder.Append("],");
+                builder.Append(allnumbers);
+                builder.Append(")\n");
+
+                /*
+                state += Amplitudes[0].Real;
+
+                for (int i = 1; i < AmplitudeLength; i++) {
+                    state += "," + Amplitudes[i].Real;                    
+                }     
+                state += "]"; 
+                */
             }
 
             for (int i = 0; i < Gates.Count; i++) {
                 Gate gate = Gates[i];
                 switch (gate.CircuitType) {
                     case CircuitType.X:
-                        translation += "qc.x(" + gate.First + ")\n";
+                        //translation += "qc.x(" + gate.First + ")\n";
+                        builder.Append("qc.x(");
+                        builder.Append(gate.First);
+                        builder.Append(")\n");
                         break;
                     case CircuitType.RX:
-                        translation += "qc.rx(" + gate.Theta + "," + gate.First + ")\n";
+                        //translation += "qc.rx(" + gate.Theta + "," + gate.First + ")\n";
+                        builder.Append("qc.rx(");
+                        builder.Append(gate.Theta);
+                        builder.Append(", ");
+                        builder.Append(gate.First);
+                        builder.Append(")\n");
                         break;
                     case CircuitType.H:
-                        translation += "qc.h(" + gate.First + ")\n";
+                        //translation += "qc.h(" + gate.First + ")\n";
+                        builder.Append("qc.h(");
+                        builder.Append(gate.First);
+                        builder.Append(", ");
+                        builder.Append(gate.Second);
+                        builder.Append(")\n");
                         break;
                     case CircuitType.CX:
-                        translation += "qc.cx(" + gate.First + "," + gate.Second + ")\n";
+                        //translation += "qc.cx(" + gate.First + "," + gate.Second + ")\n";
+                        builder.Append("qc.cx(");
+                        builder.Append(gate.First);
+                        builder.Append(", ");
+                        builder.Append(gate.Second);
+                        builder.Append(")\n");
+                        break;
+                    case CircuitType.CRX:
+                        //TODO using uniform
+                        /*                         
+        U = np.array([
+        [1, 0, 0, 0],
+        [0, 0, 1, 0],
+        [0, 1, 0, 0],
+        [0, 0, 0, 1]
+        ])
+        U = fractional_matrix_power(U,fraction)
+            combined_qc.unitary(U, [q0,q1],\
+                                 label='partial_swap')
+                        */
+
+                        /*
+                        builder.Append("qc.crx(");
+                        builder.Append(gate.Theta);
+                        builder.Append(", ");
+                        builder.Append(gate.First);
+                        builder.Append(", ");
+                        builder.Append(gate.Second);
+                        builder.Append(")\n");
+                        */
                         break;
                     case CircuitType.M:
-                        translation += "qc.measure(" + gate.First + "," + gate.Second + ")\n";
+                        //translation += "qc.measure(" + gate.First + "," + gate.Second + ")\n";
+                        builder.Append("qc.measure(");
+                        builder.Append(gate.First);
+                        builder.Append(", ");
+                        builder.Append(gate.Second);
+                        builder.Append(")\n");
                         break;
                     default:
                         break;
@@ -282,13 +378,62 @@ namespace Qiskit {
             }
 
             if (includeAllMeasures) {
+                /*
                 string allQubits = "0";
                 for (int i = 1; i < NumberOfQubits && i<NumberOfOutputs; i++) {
                     allQubits += "," + i;
                 }
                 translation += "qc.measure([" + allQubits + "], [" + allQubits + "])\n";
+                */
+
+
+                //translation += "qc.measure(" + allnumbers + ", " + allnumbers + ")\n";
+
+
+                builder.Append("qc.measure(");
+                builder.Append(allnumbers);
+                builder.Append(", ");
+                builder.Append(allnumbers);
+                builder.Append(")\n");
+
             }
-            return translation;
+
+            return builder.ToString();
+
+            //return translation;
+        }
+
+
+        string getAllNumbersString(int length) {
+
+            StringBuilder builder = new StringBuilder(2 * length + 2);
+
+
+            //Generating an int array and transform the whole array into string,
+            //This makes the string construction faster with the join.
+            int[] numbers = new int[length];
+            for (int i = 0; i < length; i++) {
+                numbers[i] = i;
+            }
+            string numberString = string.Join(",", numbers);
+
+            builder.Append("[");
+            builder.Append(numberString);
+            builder.Append("]");
+
+            string output = builder.ToString();
+
+            //string output = "["+ numberString+"]";
+
+            return output;
+            /*
+            output += "0";
+            for (int i = 1; i < NumberOfQubits && i < NumberOfOutputs; i++) {
+                output += "," + i;
+            }
+            output += "]";
+            return output;
+            */
         }
 
         public void AddCircuit(QuantumCircuit circuit) {
