@@ -45,6 +45,7 @@ namespace QuantumImage {
         const string imageHelperName = @"quantumimagehelper.py";
 
         //internal values for the python in order to only have to do this initialization once, since it is quite slow.
+        //This are objects created from pythonFiles via Ironpython. This works only with Python 2.0
         ScriptEngine engine;
         dynamic pythonFile;
         dynamic blurHelper;
@@ -672,8 +673,16 @@ namespace QuantumImage {
 
             return dictionary;
         }
-
+        /// <summary>
+        /// getting a blurred circuit from image data using python (via iron python)
+        /// </summary>
+        /// <param name="imageData">The data of the image, encoded in a 2D bool array</param>
+        /// <param name="rotation">The rotation the higher, the stronger the Blur effect (between 0 and pi)</param>
+        /// <param name="useLog">If logarithmic encoding is chosen</param>
+        /// <returns></returns>
         QuantumCircuit getBlurCircuitFromData(double[,] imageData, float rotation, bool useLog = false) {
+
+            // initialising the blurhelper with the data
             blurHelper.SetHeights(imageData, imageData.GetLength(0), imageData.GetLength(1), useLog);
             //Applying rotation
             blurHelper.ApplyPartialX(rotation);

@@ -33,13 +33,15 @@ public class QuantumBlurUsageInspector : Editor {
 
         // Spawn buttons
 
-
+        /*
         if (GUILayout.Button("Apply Simple Blur")) {
             if (targetScript.OutputTexture != null && !AssetDatabase.Contains(targetScript.OutputTexture)) {
                 Texture2D.DestroyImmediate(targetScript.OutputTexture);
                 Resources.UnloadUnusedAssets();
             }
             targetScript.OutputTexture = targetScript.CalculateSimpleBlur(targetScript.InputTexture, targetScript.Rotation, targetScript.LogarithmicEncoding);
+            targetScript.SetImage();
+        
         }
 
         if (GUILayout.Button("Apply Simple Half Blur")) {
@@ -48,7 +50,9 @@ public class QuantumBlurUsageInspector : Editor {
                 Resources.UnloadUnusedAssets();
             }
             targetScript.OutputTexture = targetScript.CalculateSimpleHalfBlur(targetScript.InputTexture, targetScript.Rotation, targetScript.LogarithmicEncoding);
+            targetScript.SetImage();
         }
+        */
 
         if (GUILayout.Button("Apply Unity Blur")) {
             if (targetScript.OutputTexture != null && !AssetDatabase.Contains(targetScript.OutputTexture)) {
@@ -56,6 +60,7 @@ public class QuantumBlurUsageInspector : Editor {
                 Resources.UnloadUnusedAssets();
             }
             targetScript.OutputTexture = QuantumBlurUsage.CalculateUnityBlur(targetScript.InputTexture, targetScript.Rotation);
+            targetScript.SetImage();
         }
 
         if (GUILayout.Button("Apply your own image effect")) {
@@ -64,6 +69,7 @@ public class QuantumBlurUsageInspector : Editor {
                 Resources.UnloadUnusedAssets();
             }
             targetScript.OutputTexture = QuantumBlurUsage.CalculateMyOwnEffect(targetScript.InputTexture);
+            targetScript.SetImage();
         }
 
         if (GUILayout.Button("Blur Mesh effect")) {
