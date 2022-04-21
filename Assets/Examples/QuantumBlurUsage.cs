@@ -202,7 +202,7 @@ public class QuantumBlurUsage : MonoBehaviour {
         //You can use the functions in the region "Effects" bellow
 
 
-        //*
+        /*
         ApplyPartialQToFraction(red, 0.3f,2);
         ApplyPartialQToFraction(green, 0.3f,2);
         ApplyPartialQToFraction(blue, 0.3f,2);
@@ -217,7 +217,7 @@ public class QuantumBlurUsage : MonoBehaviour {
         // */
 
 
-        /*
+        //*
 
         ApplyHadamar(red, 7);
         ApplyHadamar(green, 7);
