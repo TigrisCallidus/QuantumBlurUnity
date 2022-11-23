@@ -15,7 +15,11 @@ The way the gates work on the quantum circuit is the same as in [MicroQiskit](ht
 
 QuantumBlurUnity needs a not too old version of [Unity](https://unity3d.com/de/get-unity/download) in order to use it.
 It was written using Unity 2019.4, however, it should also be compatible to previous versions, since only basic Unity functionality is used.
-This package uses [Unity Python](https://github.com/exodrifter/unity-python) which itself works for Unity 2019.3 or later. This package is included in the project and does not need to be downloaded separately.
+
+## IronPython
+
+An old part of this project uses [Unity Python](https://github.com/exodrifter/unity-python) which itself works for Unity 2019.3 or later. This package is included in the project and does not need to be downloaded separately. However, most of the new part does not.
+Since IronPython caused some problems on some machines, its now no longer activated by default. If you want to use the IronPython parts you need to add  **Using_IronPython**  to the scripting define symbols, in order to activate it.
 
 # Installation
 
