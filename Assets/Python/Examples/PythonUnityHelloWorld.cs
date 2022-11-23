@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+#if Using_IronPython
+
+
 namespace Exodrifter.UnityPython.Examples
 {
 	public class PythonUnityHelloWorld : MonoBehaviour
@@ -17,3 +20,5 @@ namespace Exodrifter.UnityPython.Examples
 		}
 	}
 }
+
+#endif

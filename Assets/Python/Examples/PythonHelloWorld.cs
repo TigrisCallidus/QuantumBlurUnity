@@ -1,4 +1,7 @@
 ﻿using UnityEngine;
+
+#if Using_IronPython
+
 using IronPython.Hosting;
 
 namespace Exodrifter.UnityPython.Examples
@@ -19,3 +22,5 @@ namespace Exodrifter.UnityPython.Examples
 		}
 	}
 }
+
+#endif

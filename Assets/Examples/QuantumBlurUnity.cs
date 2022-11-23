@@ -97,12 +97,15 @@ public class QuantumBlurUnity : MonoBehaviour {
         }
 
         bool differentDecoding = !UseLogarithmicEncoding && UseOnlyLogarithmicDecoding;
+#if Using_IronPython
 
         if (ColoredImage) {
             OutputTexture = creator.CreateBlurTextureColor(InputTexture1, Rotation * Mathf.PI, UseLogarithmicEncoding, differentDecoding);
         } else {
             OutputTexture = creator.CreateBlurTextureGrey(InputTexture1, Rotation * Mathf.PI, UseLogarithmicEncoding, differentDecoding);
         }
+
+#endif
     }
 
     /// <summary>
@@ -116,17 +119,19 @@ public class QuantumBlurUnity : MonoBehaviour {
             creator = new QuantumImageCreator();
         }
 
+#if Using_IronPython
+
         if (ColoredImage) {
             OutputTexture = creator.TeleportTexturesColoredPartByPart(InputTexture1, InputTexture2, TeleportPercentage);
 
         } else {
             OutputTexture = creator.TeleportTexturesGreyPartByPart(InputTexture1, InputTexture2, TeleportPercentage);
         }
-
+#endif
     }
 
 
-    #region FileBrowser
+#region FileBrowser
 
     public void SaveFileDirect() {
         string path = Path.Combine(Application.dataPath, FolderName, FileName + ".png");
@@ -192,10 +197,10 @@ public class QuantumBlurUnity : MonoBehaviour {
         Debug.Log("Request got cancelled");
     }
 
-    #endregion
+#endregion
 
     //All this functions are needed for the UI
-    #region UI
+#region UI
 
     //Which UI is show
     bool isBlurMode = true;
@@ -275,7 +280,7 @@ public class QuantumBlurUnity : MonoBehaviour {
 
         }
     }
-    #endregion
+#endregion
 
 
 }

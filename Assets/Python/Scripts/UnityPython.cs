@@ -1,4 +1,7 @@
-﻿using IronPython.Hosting;
+﻿#if Using_IronPython
+
+
+using IronPython.Hosting;
 using Microsoft.Scripting.Hosting;
 using System;
 using System.Collections.Generic;
@@ -64,3 +67,4 @@ public static class UnityPython
 			.Distinct();
 	}
 }
+#endif

@@ -12,7 +12,9 @@
 // copyright notice, and modified files need to carry a notice indicating
 // that they have been altered from the originals.using System;
 
+#if Using_IronPython
 using IronPython.Hosting;
+#endif
 using Qiskit;
 using System.Collections.Generic;
 using UnityEngine;
@@ -46,16 +48,23 @@ namespace QuantumImage {
 
         //internal values for the python in order to only have to do this initialization once, since it is quite slow.
         //This are objects created from pythonFiles via Ironpython. This works only with Python 2.0
+
+#if Using_IronPython
+
         ScriptEngine engine;
         dynamic pythonFile;
         dynamic blurHelper;
 
-
+#endif
         /// <summary>
         /// Initialisation only needed for effects, which use the python files.
         /// Is relatively slow, so should be only called once.
         /// </summary>
         public QuantumImageCreator() {
+
+#if Using_IronPython
+
+
             Debug.Log("Creating new creator: " + Application.streamingAssetsPath + pythonScriptsPath + imageHelperName);
             //Init python
             engine = Python.CreateEngine();
@@ -73,12 +82,15 @@ namespace QuantumImage {
 
             //Creating a QuantumBlurHelper class used for the QuantumBlur
             blurHelper = pythonFile.QuantumBlurHelper("BlurHelper");
+
+#endif
         }
 
 
 
 
 
+#if Using_IronPython
 
         /// <summary>
         /// Constructs a quantum circuit representing an image for a specific color channel.
@@ -111,6 +123,8 @@ namespace QuantumImage {
 
             return GetCircuit(imageData, useLog);
         }
+
+
 
         /// <summary>
         /// Constructs a quantum circuit from a double array (most likely representing (a colorchannel of) an image).
@@ -210,7 +224,6 @@ namespace QuantumImage {
             return QuantumImageHelper.CalculateColorTexture(redDictionary, greenDictionary, blueDictionary, redCircuit.DimensionString);
         }
 
-
         /// <summary>
         /// Directly creates a blured image out of the greyscale input texture using the quantum blur algorithm.
         /// The blur is done via rotating qubits (in radian). Supports logarithmic encoding.
@@ -270,6 +283,8 @@ namespace QuantumImage {
 
             return OutputTexture;
         }
+
+
 
         /// <summary>
         /// Using the quantum teleportation algorithm to mix 2 images. 
@@ -470,12 +485,12 @@ namespace QuantumImage {
             return OutputTexture;
         }
 
-
+#endif 
 
 
 
         //This region contains effecs, which do not need python, so no initialization needed and just static functions.
-        #region Direct Effects (without Python)
+#region Direct Effects (without Python)
 
 
         /// <summary>
@@ -624,11 +639,11 @@ namespace QuantumImage {
             return QuantumImageHelper.CalculateColorTexture(redCircuit, greenCircuit, blueCircuit, width, height, renormalize);
         }
 
-        #endregion
+#endregion
 
 
         //Helper functions, which need python code, thats why they are not exported to QuantumImageHelper
-        #region Internal Helper Functions
+#region Internal Helper Functions
 
 
         /// <summary>
@@ -651,6 +666,9 @@ namespace QuantumImage {
 
             return QuantumImageHelper.CalculateColorTexture(redData, greenData, blueData);
         }
+
+
+#if Using_IronPython
 
         IronPython.Runtime.PythonDictionary getBlurDictionaryFromData(out string heightDimensions, double[,] imageData, float rotation, bool useLog = false) {
             //dynamic pythonHelper = PythonFile.QuantumBlurHelper("Helper");
@@ -722,8 +740,9 @@ namespace QuantumImage {
             IronPython.Runtime.PythonDictionary dictionary = pythonFile.CombinedHeightFromProbabilities(stringArray, doubleArray, doubleArray.Length, numberofQubits, heightDimensions, useLog, normalization);
             return dictionary;
         }
+#endif
 
-        #endregion
+#endregion
 
     }
 

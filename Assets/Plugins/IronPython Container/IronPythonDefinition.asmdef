@@ -1,0 +1,15 @@
+{
+    "name": "IronPythonContainer",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "Using_IronPython"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

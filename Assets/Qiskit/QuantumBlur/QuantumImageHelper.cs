@@ -755,6 +755,7 @@ namespace QuantumImage {
         }
 
 
+#if Using_IronPython
 
 
         public static Texture2D CalculateGreyTexture(IronPython.Runtime.PythonDictionary probabilityDict, string dimensions) {
@@ -832,7 +833,7 @@ namespace QuantumImage {
             texture.Apply();
             return texture;
         }
-
+#endif
 
         public static Texture2D CalculateColorTexture(double[,] redData, double[,] greenData, double[,] blueData, float redScale = 1, float greenScale = 1, float blueScale = 1) {
             int width = redData.GetLength(0);

@@ -1,4 +1,7 @@
 ﻿using UnityEngine;
+
+#if Using_IronPython
+
 using IronPython.Hosting;
 using IronPython.Runtime;
 
@@ -35,3 +38,5 @@ filename = os.path.abspath ('test.txt');";
 		}
 	}
 }
+
+#endif

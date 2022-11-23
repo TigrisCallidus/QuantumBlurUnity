@@ -95,7 +95,8 @@ public class QuantumBlurUsage : MonoBehaviour {
     /// <returns>A blured texture</returns>
     public Texture2D CalculateSimpleBlur(Texture2D inputTexture, float rotation, bool logarithmicEncoding = false) {
 
-        Texture2D outputTexture;
+        Texture2D outputTexture=null;
+#if Using_IronPython
 
         // Getting the helper class to make the rotation this will setup everything needed in python
         QuantumImageCreator creator = new QuantumImageCreator();
@@ -113,7 +114,7 @@ public class QuantumBlurUsage : MonoBehaviour {
 
         //Calculating the colored output texture from the quantum circuits for the 3 channels
         outputTexture = creator.GetColoreTextureFast(red, blue, green, logarithmicEncoding);
-
+#endif
         return outputTexture;
 
     }
@@ -128,7 +129,8 @@ public class QuantumBlurUsage : MonoBehaviour {
     /// <returns>A blured texture</returns>
     public Texture2D CalculateSimpleHalfBlur(Texture2D inputTexture, float rotation, bool logarithmicEncoding = false) {
 
-        Texture2D outputTexture;
+        Texture2D outputTexture=null;
+#if Using_IronPython
 
         // Getting the helper class to make the rotation this will setup everything needed in python
         QuantumImageCreator creator = new QuantumImageCreator();
@@ -147,7 +149,7 @@ public class QuantumBlurUsage : MonoBehaviour {
 
         //Calculating the colored output texture from the quantum circuits for the 3 channels
         outputTexture = creator.GetColoreTextureFast(red, blue, green, logarithmicEncoding);
-
+#endif
         return outputTexture;
     }
 
@@ -217,12 +219,13 @@ public class QuantumBlurUsage : MonoBehaviour {
         // */
 
 
-        //*
 
-        ApplyHadamar(red, 7);
-        ApplyHadamar(green, 7);
-        ApplyHadamar(blue, 7);
+        /*
+        red.CX(1, 2);
+        green.CX(1, 2);
+        blue.CX(1, 2);
         // */
+
 
 
         /*
@@ -261,9 +264,9 @@ public class QuantumBlurUsage : MonoBehaviour {
 
         return outputTexture;
     }
-    #endregion
+#endregion
 
-    #region Effects
+#region Effects
     /// <summary>
     /// Applies a partial rotation (in radian) to each qubit of a quantum circuit.
     /// </summary>
@@ -346,9 +349,9 @@ public class QuantumBlurUsage : MonoBehaviour {
         }
     }
 
-    #endregion
+#endregion
 
-    #region Mesh examples
+#region Mesh examples
     /// <summary>
     /// Creates a blurred version of the input mesh, according to the rotation. The bigger the rotation the stronger the blur effect.
     /// The model gets unrecognizeable as soon as the rotation gets to big
@@ -671,9 +674,9 @@ public class QuantumBlurUsage : MonoBehaviour {
             }
         }
     }
-    #endregion
+#endregion
 
-    #region Saving
+#region Saving
     /// <summary>
     /// Saves the generated image (OutputTexture) in the specified folder with the specified filename. 
     /// </summary>
@@ -689,9 +692,9 @@ public class QuantumBlurUsage : MonoBehaviour {
         string path = System.IO.Path.Combine("Assets", FolderName, MeshFileName + ".Asset");
         return path;
     }
-    #endregion
+#endregion
 
-    #region UI
+#region UI
 
     public void SetImage() {
         if (TargetImage != null) {
@@ -699,5 +702,5 @@ public class QuantumBlurUsage : MonoBehaviour {
         }
     }
 
-    #endregion
+#endregion
 }
